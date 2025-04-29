@@ -1,0 +1,70 @@
+Create a full-stack web application named "DRNXT Learning" for medical students preparing from First Year to NEET PG level.
+
+The app must include the following core modules:
+
+1. Dashboard: Personalized user dashboard with progress tracking and notifications.
+2. AI Chatbot: Medical Assistant chatbot answering academic and clinical questions using OpenAI GPT-4o.
+3. Diagnosis Tool: Symptom-based AI diagnosis assistant referencing standard textbooks like Harrison’s.
+4. Quiz Generator: 
+   - Real-time dynamic MCQ generator based on subject, topic, and difficulty.
+   - Reference standard medical books (Harrison, Robbins, Guyton, etc).
+   - Timed quizzes + performance analytics.
+5. NEET PG Prep:
+   - Stored Previous Year Question Banks.
+   - Mock Test Creation.
+   - Timer + performance tracking.
+6. AI Memory Booster:
+   - Simplify complex topics into mnemonics, analogies, and easy language.
+7. Case Generator:
+   - Generate new clinical case studies daily, aligned to Indian MBBS curriculum.
+8. Voice Assistant:
+   - Voice-to-text query for chatbot and diagnosis tool.
+9. Drug Assistant:
+   - Database lookup and GPT-4o summaries for drugs' class, MOA, indications, and side effects.
+10. AI Study Planner:
+    - User inputs goal exam, time left, subjects.
+    - AI suggests daily and weekly study plans, adapting over time.
+11. AI-Powered Notes Maker:
+    - User inputs topic.
+    - AI generates ready-to-study summarized notes with key points, mnemonics, diagrams.
+12. Medical News (MedFeed):
+    - Newsfeed section showing exam updates, medical news, residency information.
+    - Notification system for urgent news.
+    - Admin can push ads or updates inside feed.
+13. Subscription System:
+    - free trail of 20000 token after that it will be option for subscribe for rs 30000 (price should be changed)
+14. Authentication:
+    - Email/Google signup/login.
+    - JWT session management.
+    - Forgot password/reset support.
+15-help and support section
+16. Admin Panel:
+    - Newsfeed Management (add/edit/delete news).
+    - Ads/Announcement Management.
+    - Coupon Management (add/edit/delete coupons).
+    - View user stats and subscriptions.
+
+Tech Requirements:
+- Frontend: Next.js or React.js (with clean modern UI).
+- Backend: Node.js + Express or FastAPI.
+- Database: PostgreSQL or MongoDB.
+- Authentication: JWT.
+- APIs must be modular and scalable.
+- AI integrations via OpenAI GPT-4o API (support future GPT versions easily).
+
+Additional Important Notes:
+- Push Notifications system inside app.
+- All quizzes/tests must show timer and progress tracking.
+- User dashboard must show recent activity (e.g., quizzes taken, cases solved, notes made).
+- App must be mobile-responsive (adaptive for mobile users).
+- Admin can manually send pop-up announcements for important updates or offers.
+- Codebase should be clean, modular, easily extendable.
+- Developer/Owner should be able to update GPT prompts easily if needed later.
+- App should be production-ready and scalable.
+
+Final Goal:
+The platform should deeply solve real-world problems for Indian medical students by improving clinical knowledge, memory retention, exam preparation, and practical learning through AI and automation.
+
+Name of the project: DRNXT Learning
+
+
