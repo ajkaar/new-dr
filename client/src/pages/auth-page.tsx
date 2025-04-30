@@ -1,116 +1,121 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { HeartPulse, BookOpen, BrainCircuit, Stethoscope } from "lucide-react";
+import React, { useState } from 'react';
+import { useLocation } from 'wouter';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuth } from '@/hooks/use-auth';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2 } from 'lucide-react';
 
 // Login form schema
 const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  username: z.string().min(1, { message: 'Username is required' }),
+  password: z.string().min(1, { message: 'Password is required' }),
 });
 
 // Registration form schema
 const registerSchema = z.object({
-  username: z.string().min(3, { message: "Username must be at least 3 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  fullName: z.string().min(2, { message: "Full name must be at least 2 characters" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  confirmPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
+  username: z.string().min(3, { message: 'Username must be at least 3 characters' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  email: z.string().email({ message: 'Please enter a valid email address' }),
+  fullName: z.string().min(3, { message: 'Full name is required' }),
 });
 
-export default function AuthPage() {
-  const [activeTab, setActiveTab] = useState<string>("login");
-  const [, setLocation] = useLocation();
-  const { user, loginMutation, registerMutation, isLoading } = useAuth();
+type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
+
+const AuthPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>('login');
+  const [, navigate] = useLocation();
+  const { user, loginMutation, registerMutation } = useAuth();
 
   // Login form
-  const loginForm = useForm<z.infer<typeof loginSchema>>({
+  const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      username: '',
+      password: '',
     },
   });
 
-  // Register form
-  const registerForm = useForm<z.infer<typeof registerSchema>>({
+  // Registration form
+  const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
-      email: "",
-      fullName: "",
-      password: "",
-      confirmPassword: "",
+      username: '',
+      password: '',
+      email: '',
+      fullName: '',
     },
   });
 
-  // Handle login submission
-  const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
+  const onLoginSubmit = async (values: LoginFormValues) => {
     loginMutation.mutate(values);
   };
 
-  // Handle registration submission
-  const onRegisterSubmit = (values: z.infer<typeof registerSchema>) => {
+  const onRegisterSubmit = async (values: RegisterFormValues) => {
     registerMutation.mutate(values);
   };
 
-  // Redirect to dashboard if user is already logged in
-  useEffect(() => {
-    if (user) {
-      setLocation("/");
-    }
-  }, [user, setLocation]);
+  // Redirect if already logged in
+  if (user) {
+    navigate('/');
+    return null;
+  }
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col md:flex-row">
-      {/* Left side - Forms */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-6">
+    <div className="flex min-h-screen">
+      {/* Left side - Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <HeartPulse className="h-6 w-6 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold">DRNXT Learning</h2>
-            </div>
-            <CardTitle className="text-xl">Welcome to the platform</CardTitle>
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="text-2xl font-bold tracking-tight text-primary">DRNXT Learning</CardTitle>
             <CardDescription>
-              Your AI-powered medical education companion
+              Your AI-powered medical education platform
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-8">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
-              <TabsContent value="login" className="mt-4">
+
+              {/* Login Form */}
+              <TabsContent value="login">
                 <Form {...loginForm}>
                   <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                     <FormField
                       control={loginForm.control}
-                      name="email"
+                      name="username"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>Username</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter your email" {...field} />
+                            <Input placeholder="Enter your username" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={loginForm.control}
                       name="password"
@@ -118,47 +123,33 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
+                            <Input type="password" placeholder="Enter your password" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full" disabled={isLoading || loginMutation.isPending}>
-                      {loginMutation.isPending ? "Logging in..." : "Login"}
+
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={loginMutation.isPending}
+                    >
+                      {loginMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Logging in...
+                        </>
+                      ) : 'Login'}
                     </Button>
                   </form>
                 </Form>
               </TabsContent>
-              <TabsContent value="register" className="mt-4">
+
+              {/* Register Form */}
+              <TabsContent value="register">
                 <Form {...registerForm}>
                   <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
-                    <FormField
-                      control={registerForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Username</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Choose a username" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={registerForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter your email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                     <FormField
                       control={registerForm.control}
                       name="fullName"
@@ -172,6 +163,35 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={registerForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="Enter your email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={registerForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Choose a username" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <FormField
                       control={registerForm.control}
                       name="password"
@@ -179,90 +199,83 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
+                            <Input type="password" placeholder="Create a password" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={registerForm.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Confirm Password</FormLabel>
-                          <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="submit" className="w-full" disabled={isLoading || registerMutation.isPending}>
-                      {registerMutation.isPending ? "Creating account..." : "Register"}
+
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={registerMutation.isPending}
+                    >
+                      {registerMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Creating account...
+                        </>
+                      ) : 'Create Account'}
                     </Button>
                   </form>
                 </Form>
               </TabsContent>
             </Tabs>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
-            <div className="text-xs text-muted-foreground text-center">
-              By continuing, you agree to our Terms of Service and Privacy Policy.
-            </div>
-          </CardFooter>
         </Card>
       </div>
 
-      {/* Right side - Hero section */}
-      <div className="hidden md:flex md:w-1/2 bg-primary-600 text-white flex-col justify-center p-12">
-        <div className="max-w-md mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-3">Transform Your Medical Learning Journey</h1>
-            <p className="text-primary-100 text-lg">
-              AI-powered platform for medical students from First Year to NEET PG
-            </p>
+      {/* Right side - Hero */}
+      <div className="hidden md:flex flex-1 bg-primary p-8 text-white items-center justify-center">
+        <div className="max-w-md space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">DRNXT Learning</h1>
+            <p className="text-lg">Transform your medical education with AI-powered learning tools</p>
           </div>
 
-          <div className="space-y-6">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-primary-700 rounded-lg">
-                <BookOpen className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-medium">Personalized Learning</h3>
-                <p className="text-primary-200 text-sm">
-                  Adaptive study plans tailored to your goals and learning pace
-                </p>
-              </div>
-            </div>
+          <ul className="space-y-4">
+            <li className="flex items-center space-x-3">
+              <svg className="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>AI Chatbot for medical queries</span>
+            </li>
+            <li className="flex items-center space-x-3">
+              <svg className="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>Diagnosis assistance tool</span>
+            </li>
+            <li className="flex items-center space-x-3">
+              <svg className="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>Quiz generator for NEET PG preparation</span>
+            </li>
+            <li className="flex items-center space-x-3">
+              <svg className="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>Clinical case studies generator</span>
+            </li>
+            <li className="flex items-center space-x-3">
+              <svg className="h-5 w-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>AI-powered study notes maker</span>
+            </li>
+          </ul>
 
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-primary-700 rounded-lg">
-                <BrainCircuit className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-medium">AI-Powered Tools</h3>
-                <p className="text-primary-200 text-sm">
-                  From chatbots to memory boosters, AI helps you learn more efficiently
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-primary-700 rounded-lg">
-                <Stethoscope className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-medium">Comprehensive NEET PG Prep</h3>
-                <p className="text-primary-200 text-sm">
-                  Previous year questions, mock tests, and performance analytics
-                </p>
-              </div>
-            </div>
+          <div className="pt-4">
+            <p className="text-sm opacity-80">
+              Join thousands of Indian medical students preparing for their exams with DRNXT Learning. Our platform provides comprehensive tools for MBBS students at all levels.
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default AuthPage;

@@ -1,448 +1,299 @@
-import {
-  users, User, InsertUser, studyProgress, StudyProgress, InsertStudyProgress,
-  quizAttempts, QuizAttempt, InsertQuizAttempt, medicalNews, MedicalNews, InsertMedicalNews,
-  studyPlans, StudyPlan, InsertStudyPlan, chatHistory, ChatHistory, InsertChatHistory,
-  chatMessages, ChatMessage, InsertChatMessage, notes, Note, InsertNote,
-  coupons, Coupon, InsertCoupon
+import { 
+  users, type User, type InsertUser,
+  quizAttempts, type QuizAttempt, type InsertQuizAttempt,
+  studySessions, type StudySession, type InsertStudySession,
+  notes, type Note, type InsertNote,
+  caseStudies, type CaseStudy, type InsertCaseStudy,
+  medicalNews, type MedicalNews, type InsertMedicalNews,
+  studyPlans, type StudyPlan, type InsertStudyPlan,
+  announcements, type Announcement, type InsertAnnouncement,
+  coupons, type Coupon, type InsertCoupon
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
 
-// modify the interface with any CRUD methods
-// you might need
 export interface IStorage {
-  // Users
+  // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+  updateUserTokenUsage(userId: number, tokenUsage: number): Promise<User | undefined>;
   
-  // Study Progress
-  getStudyProgressByUser(userId: number): Promise<StudyProgress[]>;
-  getStudyProgressBySubject(userId: number, subject: string): Promise<StudyProgress[]>;
-  createStudyProgress(progress: InsertStudyProgress): Promise<StudyProgress>;
-  updateStudyProgress(id: number, progress: Partial<StudyProgress>): Promise<StudyProgress | undefined>;
-  
-  // Quiz Attempts
+  // Quiz operations
+  createQuizAttempt(quizAttempt: InsertQuizAttempt): Promise<QuizAttempt>;
   getQuizAttemptsByUser(userId: number): Promise<QuizAttempt[]>;
-  getQuizAttemptsBySubject(userId: number, subject: string): Promise<QuizAttempt[]>;
-  createQuizAttempt(attempt: InsertQuizAttempt): Promise<QuizAttempt>;
+  getRecentQuizAttempts(userId: number, limit: number): Promise<QuizAttempt[]>;
   
-  // Medical News
-  getAllMedicalNews(): Promise<MedicalNews[]>;
-  getMedicalNewsById(id: number): Promise<MedicalNews | undefined>;
-  createMedicalNews(news: InsertMedicalNews): Promise<MedicalNews>;
-  updateMedicalNews(id: number, news: Partial<MedicalNews>): Promise<MedicalNews | undefined>;
-  deleteMedicalNews(id: number): Promise<boolean>;
+  // Study session operations
+  createStudySession(studySession: InsertStudySession): Promise<StudySession>;
+  getStudySessionsByUser(userId: number): Promise<StudySession[]>;
+  getStudyTimeByUserThisWeek(userId: number): Promise<number>; // returns minutes
   
-  // Study Plans
-  getStudyPlanByUser(userId: number): Promise<StudyPlan | undefined>;
-  createStudyPlan(plan: InsertStudyPlan): Promise<StudyPlan>;
-  updateStudyPlan(id: number, plan: Partial<StudyPlan>): Promise<StudyPlan | undefined>;
-  
-  // Chat History
-  getChatHistoryByUser(userId: number): Promise<ChatHistory[]>;
-  getChatHistoryById(id: number): Promise<ChatHistory | undefined>;
-  createChatHistory(chat: InsertChatHistory): Promise<ChatHistory>;
-  updateChatHistory(id: number, chat: Partial<ChatHistory>): Promise<ChatHistory | undefined>;
-  
-  // Chat Messages
-  getChatMessagesByChatId(chatId: number): Promise<ChatMessage[]>;
-  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
-  
-  // Notes
-  getNotesByUser(userId: number): Promise<Note[]>;
-  getNoteById(id: number): Promise<Note | undefined>;
+  // Notes operations
   createNote(note: InsertNote): Promise<Note>;
-  updateNote(id: number, note: Partial<Note>): Promise<Note | undefined>;
-  deleteNote(id: number): Promise<boolean>;
+  getNotesByUser(userId: number): Promise<Note[]>;
+  getRecentNotes(userId: number, limit: number): Promise<Note[]>;
   
-  // Coupons
-  getAllCoupons(): Promise<Coupon[]>;
-  getCouponByCode(code: string): Promise<Coupon | undefined>;
+  // Case studies operations
+  createCaseStudy(caseStudy: InsertCaseStudy): Promise<CaseStudy>;
+  getCaseStudiesByUser(userId: number): Promise<CaseStudy[]>;
+  
+  // Medical news operations
+  createMedicalNews(news: InsertMedicalNews): Promise<MedicalNews>;
+  getMedicalNews(limit: number, offset: number): Promise<MedicalNews[]>;
+  getMedicalNewsByCategory(category: string, limit: number): Promise<MedicalNews[]>;
+  
+  // Study plan operations
+  createStudyPlan(plan: InsertStudyPlan): Promise<StudyPlan>;
+  getStudyPlanByUser(userId: number): Promise<StudyPlan | undefined>;
+  
+  // Announcement operations
+  createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
+  getActiveAnnouncements(): Promise<Announcement[]>;
+  
+  // Coupon operations
   createCoupon(coupon: InsertCoupon): Promise<Coupon>;
-  updateCoupon(id: number, coupon: Partial<Coupon>): Promise<Coupon | undefined>;
-  deleteCoupon(id: number): Promise<boolean>;
+  getCouponByCode(code: string): Promise<Coupon | undefined>;
   
   // Session store
   sessionStore: session.SessionStore;
 }
 
 export class MemStorage implements IStorage {
-  private usersMap: Map<number, User>;
-  private studyProgressMap: Map<number, StudyProgress>;
-  private quizAttemptsMap: Map<number, QuizAttempt>;
-  private medicalNewsMap: Map<number, MedicalNews>;
-  private studyPlansMap: Map<number, StudyPlan>;
-  private chatHistoryMap: Map<number, ChatHistory>;
-  private chatMessagesMap: Map<number, ChatMessage>;
-  private notesMap: Map<number, Note>;
-  private couponsMap: Map<number, Coupon>;
+  private users: Map<number, User>;
+  private quizAttempts: Map<number, QuizAttempt>;
+  private studySessions: Map<number, StudySession>;
+  private notes: Map<number, Note>;
+  private caseStudies: Map<number, CaseStudy>;
+  private medicalNews: Map<number, MedicalNews>;
+  private studyPlans: Map<number, StudyPlan>;
+  private announcements: Map<number, Announcement>;
+  private coupons: Map<number, Coupon>;
   
-  private currentUserId: number;
-  private currentStudyProgressId: number;
-  private currentQuizAttemptId: number;
-  private currentMedicalNewsId: number;
-  private currentStudyPlanId: number;
-  private currentChatHistoryId: number;
-  private currentChatMessageId: number;
-  private currentNoteId: number;
-  private currentCouponId: number;
+  private userCurrentId: number = 1;
+  private quizAttemptCurrentId: number = 1;
+  private studySessionCurrentId: number = 1;
+  private noteCurrentId: number = 1;
+  private caseStudyCurrentId: number = 1;
+  private medicalNewsCurrentId: number = 1;
+  private studyPlanCurrentId: number = 1;
+  private announcementCurrentId: number = 1;
+  private couponCurrentId: number = 1;
   
-  public sessionStore: session.SessionStore;
+  sessionStore: session.SessionStore;
 
   constructor() {
-    this.usersMap = new Map();
-    this.studyProgressMap = new Map();
-    this.quizAttemptsMap = new Map();
-    this.medicalNewsMap = new Map();
-    this.studyPlansMap = new Map();
-    this.chatHistoryMap = new Map();
-    this.chatMessagesMap = new Map();
-    this.notesMap = new Map();
-    this.couponsMap = new Map();
-    
-    this.currentUserId = 1;
-    this.currentStudyProgressId = 1;
-    this.currentQuizAttemptId = 1;
-    this.currentMedicalNewsId = 1;
-    this.currentStudyPlanId = 1;
-    this.currentChatHistoryId = 1;
-    this.currentChatMessageId = 1;
-    this.currentNoteId = 1;
-    this.currentCouponId = 1;
+    this.users = new Map();
+    this.quizAttempts = new Map();
+    this.studySessions = new Map();
+    this.notes = new Map();
+    this.caseStudies = new Map();
+    this.medicalNews = new Map();
+    this.studyPlans = new Map();
+    this.announcements = new Map();
+    this.coupons = new Map();
     
     this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
-    });
-    
-    // Add some initial medical news
-    this.createMedicalNews({
-      title: "NEET PG 2023: New Exam Pattern Announced",
-      content: "The National Board of Examinations has announced changes to the NEET PG exam pattern starting from 2023...",
-      category: "Exam Updates",
-      isImportant: true,
-      createdBy: 1
-    });
-    
-    this.createMedicalNews({
-      title: "New Research: Breakthrough in Alzheimer's Treatment",
-      content: "A groundbreaking study published in NEJM reveals promising results for a new drug targeting amyloid plaques...",
-      category: "Research",
-      isImportant: false,
-      createdBy: 1
-    });
-    
-    this.createMedicalNews({
-      title: "Medical Council Updates Clinical Practice Guidelines",
-      content: "The Medical Council of India has released updated clinical practice guidelines for several common conditions...",
-      category: "Guidelines",
-      isImportant: false,
-      createdBy: 1
+      checkPeriod: 86400000, // prune expired entries every 24h
     });
   }
 
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.usersMap.get(id);
+    return this.users.get(id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.usersMap.values()).find(
-      (user) => user.username.toLowerCase() === username.toLowerCase()
+    return Array.from(this.users.values()).find(
+      (user) => user.username === username,
     );
   }
   
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.usersMap.values()).find(
-      (user) => user.email.toLowerCase() === email.toLowerCase()
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
     );
   }
 
-  async createUser(user: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const now = new Date();
-    const newUser: User = { 
-      ...user, 
-      id,
-      createdAt: now
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = this.userCurrentId++;
+    const createdAt = new Date();
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      createdAt, 
+      subscriptionStatus: "free_trial", 
+      tokenUsage: 0, 
+      tokenLimit: 20000 
     };
-    this.usersMap.set(id, newUser);
-    return newUser;
+    this.users.set(id, user);
+    return user;
   }
   
-  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
-    const user = await this.getUser(id);
+  async updateUserTokenUsage(userId: number, tokenUsage: number): Promise<User | undefined> {
+    const user = await this.getUser(userId);
     if (!user) return undefined;
     
-    const updatedUser = { ...user, ...userData };
-    this.usersMap.set(id, updatedUser);
+    const updatedUser: User = {
+      ...user,
+      tokenUsage
+    };
+    
+    this.users.set(userId, updatedUser);
     return updatedUser;
   }
-  
-  // Study Progress methods
-  async getStudyProgressByUser(userId: number): Promise<StudyProgress[]> {
-    return Array.from(this.studyProgressMap.values()).filter(
-      (progress) => progress.userId === userId
-    );
+
+  // Quiz methods
+  async createQuizAttempt(insertQuizAttempt: InsertQuizAttempt): Promise<QuizAttempt> {
+    const id = this.quizAttemptCurrentId++;
+    const completedAt = new Date();
+    const quizAttempt: QuizAttempt = { ...insertQuizAttempt, id, completedAt };
+    this.quizAttempts.set(id, quizAttempt);
+    return quizAttempt;
   }
   
-  async getStudyProgressBySubject(userId: number, subject: string): Promise<StudyProgress[]> {
-    return Array.from(this.studyProgressMap.values()).filter(
-      (progress) => progress.userId === userId && progress.subject === subject
-    );
-  }
-  
-  async createStudyProgress(progress: InsertStudyProgress): Promise<StudyProgress> {
-    const id = this.currentStudyProgressId++;
-    const now = new Date();
-    const newProgress: StudyProgress = {
-      ...progress,
-      id,
-      lastStudied: now
-    };
-    this.studyProgressMap.set(id, newProgress);
-    return newProgress;
-  }
-  
-  async updateStudyProgress(id: number, progressData: Partial<StudyProgress>): Promise<StudyProgress | undefined> {
-    const progress = this.studyProgressMap.get(id);
-    if (!progress) return undefined;
-    
-    const now = new Date();
-    const updatedProgress = { 
-      ...progress, 
-      ...progressData,
-      lastStudied: now
-    };
-    this.studyProgressMap.set(id, updatedProgress);
-    return updatedProgress;
-  }
-  
-  // Quiz Attempts methods
   async getQuizAttemptsByUser(userId: number): Promise<QuizAttempt[]> {
-    return Array.from(this.quizAttemptsMap.values())
+    return Array.from(this.quizAttempts.values())
       .filter(attempt => attempt.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime());
   }
   
-  async getQuizAttemptsBySubject(userId: number, subject: string): Promise<QuizAttempt[]> {
-    return Array.from(this.quizAttemptsMap.values())
-      .filter(attempt => attempt.userId === userId && attempt.subject === subject)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  async getRecentQuizAttempts(userId: number, limit: number): Promise<QuizAttempt[]> {
+    return (await this.getQuizAttemptsByUser(userId)).slice(0, limit);
+  }
+
+  // Study session methods
+  async createStudySession(insertStudySession: InsertStudySession): Promise<StudySession> {
+    const id = this.studySessionCurrentId++;
+    const date = new Date();
+    const studySession: StudySession = { ...insertStudySession, id, date };
+    this.studySessions.set(id, studySession);
+    return studySession;
   }
   
-  async createQuizAttempt(attempt: InsertQuizAttempt): Promise<QuizAttempt> {
-    const id = this.currentQuizAttemptId++;
+  async getStudySessionsByUser(userId: number): Promise<StudySession[]> {
+    return Array.from(this.studySessions.values())
+      .filter(session => session.userId === userId)
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+  }
+  
+  async getStudyTimeByUserThisWeek(userId: number): Promise<number> {
     const now = new Date();
-    const newAttempt: QuizAttempt = {
-      ...attempt,
-      id,
-      createdAt: now
-    };
-    this.quizAttemptsMap.set(id, newAttempt);
-    return newAttempt;
-  }
-  
-  // Medical News methods
-  async getAllMedicalNews(): Promise<MedicalNews[]> {
-    return Array.from(this.medicalNewsMap.values())
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-  
-  async getMedicalNewsById(id: number): Promise<MedicalNews | undefined> {
-    return this.medicalNewsMap.get(id);
-  }
-  
-  async createMedicalNews(news: InsertMedicalNews): Promise<MedicalNews> {
-    const id = this.currentMedicalNewsId++;
-    const now = new Date();
-    const newNews: MedicalNews = {
-      ...news,
-      id,
-      createdAt: now
-    };
-    this.medicalNewsMap.set(id, newNews);
-    return newNews;
-  }
-  
-  async updateMedicalNews(id: number, newsData: Partial<MedicalNews>): Promise<MedicalNews | undefined> {
-    const news = this.medicalNewsMap.get(id);
-    if (!news) return undefined;
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
     
-    const updatedNews = { ...news, ...newsData };
-    this.medicalNewsMap.set(id, updatedNews);
-    return updatedNews;
+    return Array.from(this.studySessions.values())
+      .filter(session => session.userId === userId && session.date >= weekStart)
+      .reduce((total, session) => total + session.duration, 0);
   }
-  
-  async deleteMedicalNews(id: number): Promise<boolean> {
-    return this.medicalNewsMap.delete(id);
-  }
-  
-  // Study Plans methods
-  async getStudyPlanByUser(userId: number): Promise<StudyPlan | undefined> {
-    return Array.from(this.studyPlansMap.values()).find(
-      (plan) => plan.userId === userId
-    );
-  }
-  
-  async createStudyPlan(plan: InsertStudyPlan): Promise<StudyPlan> {
-    const id = this.currentStudyPlanId++;
-    const now = new Date();
-    const newPlan: StudyPlan = {
-      ...plan,
-      id,
-      createdAt: now,
-      updatedAt: now
-    };
-    this.studyPlansMap.set(id, newPlan);
-    return newPlan;
-  }
-  
-  async updateStudyPlan(id: number, planData: Partial<StudyPlan>): Promise<StudyPlan | undefined> {
-    const plan = this.studyPlansMap.get(id);
-    if (!plan) return undefined;
-    
-    const now = new Date();
-    const updatedPlan = { 
-      ...plan, 
-      ...planData,
-      updatedAt: now
-    };
-    this.studyPlansMap.set(id, updatedPlan);
-    return updatedPlan;
-  }
-  
-  // Chat History methods
-  async getChatHistoryByUser(userId: number): Promise<ChatHistory[]> {
-    return Array.from(this.chatHistoryMap.values())
-      .filter(chat => chat.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-  
-  async getChatHistoryById(id: number): Promise<ChatHistory | undefined> {
-    return this.chatHistoryMap.get(id);
-  }
-  
-  async createChatHistory(chat: InsertChatHistory): Promise<ChatHistory> {
-    const id = this.currentChatHistoryId++;
-    const now = new Date();
-    const newChat: ChatHistory = {
-      ...chat,
-      id,
-      createdAt: now
-    };
-    this.chatHistoryMap.set(id, newChat);
-    return newChat;
-  }
-  
-  async updateChatHistory(id: number, chatData: Partial<ChatHistory>): Promise<ChatHistory | undefined> {
-    const chat = this.chatHistoryMap.get(id);
-    if (!chat) return undefined;
-    
-    const updatedChat = { ...chat, ...chatData };
-    this.chatHistoryMap.set(id, updatedChat);
-    return updatedChat;
-  }
-  
-  // Chat Messages methods
-  async getChatMessagesByChatId(chatId: number): Promise<ChatMessage[]> {
-    return Array.from(this.chatMessagesMap.values())
-      .filter(message => message.chatId === chatId)
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  }
-  
-  async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
-    const id = this.currentChatMessageId++;
-    const now = new Date();
-    const newMessage: ChatMessage = {
-      ...message,
-      id,
-      createdAt: now
-    };
-    this.chatMessagesMap.set(id, newMessage);
-    return newMessage;
-  }
-  
+
   // Notes methods
+  async createNote(insertNote: InsertNote): Promise<Note> {
+    const id = this.noteCurrentId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    const note: Note = { ...insertNote, id, createdAt, updatedAt };
+    this.notes.set(id, note);
+    return note;
+  }
+  
   async getNotesByUser(userId: number): Promise<Note[]> {
-    return Array.from(this.notesMap.values())
+    return Array.from(this.notes.values())
       .filter(note => note.userId === userId)
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
   
-  async getNoteById(id: number): Promise<Note | undefined> {
-    return this.notesMap.get(id);
+  async getRecentNotes(userId: number, limit: number): Promise<Note[]> {
+    return (await this.getNotesByUser(userId)).slice(0, limit);
+  }
+
+  // Case studies methods
+  async createCaseStudy(insertCaseStudy: InsertCaseStudy): Promise<CaseStudy> {
+    const id = this.caseStudyCurrentId++;
+    const createdAt = new Date();
+    const caseStudy: CaseStudy = { ...insertCaseStudy, id, createdAt };
+    this.caseStudies.set(id, caseStudy);
+    return caseStudy;
   }
   
-  async createNote(note: InsertNote): Promise<Note> {
-    const id = this.currentNoteId++;
+  async getCaseStudiesByUser(userId: number): Promise<CaseStudy[]> {
+    return Array.from(this.caseStudies.values())
+      .filter(caseStudy => caseStudy.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  // Medical news methods
+  async createMedicalNews(insertMedicalNews: InsertMedicalNews): Promise<MedicalNews> {
+    const id = this.medicalNewsCurrentId++;
+    const publishedAt = new Date();
+    const medicalNews: MedicalNews = { ...insertMedicalNews, id, publishedAt };
+    this.medicalNews.set(id, medicalNews);
+    return medicalNews;
+  }
+  
+  async getMedicalNews(limit: number, offset: number): Promise<MedicalNews[]> {
+    return Array.from(this.medicalNews.values())
+      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
+      .slice(offset, offset + limit);
+  }
+  
+  async getMedicalNewsByCategory(category: string, limit: number): Promise<MedicalNews[]> {
+    return Array.from(this.medicalNews.values())
+      .filter(news => news.category === category)
+      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
+      .slice(0, limit);
+  }
+
+  // Study plan methods
+  async createStudyPlan(insertStudyPlan: InsertStudyPlan): Promise<StudyPlan> {
+    const id = this.studyPlanCurrentId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    const studyPlan: StudyPlan = { ...insertStudyPlan, id, createdAt, updatedAt };
+    this.studyPlans.set(id, studyPlan);
+    return studyPlan;
+  }
+  
+  async getStudyPlanByUser(userId: number): Promise<StudyPlan | undefined> {
+    return Array.from(this.studyPlans.values())
+      .find(plan => plan.userId === userId);
+  }
+
+  // Announcement methods
+  async createAnnouncement(insertAnnouncement: InsertAnnouncement): Promise<Announcement> {
+    const id = this.announcementCurrentId++;
+    const startDate = new Date();
+    const announcement: Announcement = { ...insertAnnouncement, id, startDate };
+    this.announcements.set(id, announcement);
+    return announcement;
+  }
+  
+  async getActiveAnnouncements(): Promise<Announcement[]> {
     const now = new Date();
-    const newNote: Note = {
-      ...note,
-      id,
-      createdAt: now,
-      updatedAt: now
-    };
-    this.notesMap.set(id, newNote);
-    return newNote;
+    return Array.from(this.announcements.values())
+      .filter(announcement => 
+        announcement.isActive && 
+        announcement.startDate <= now && 
+        (!announcement.endDate || announcement.endDate >= now)
+      )
+      .sort((a, b) => b.priority - a.priority);
   }
-  
-  async updateNote(id: number, noteData: Partial<Note>): Promise<Note | undefined> {
-    const note = this.notesMap.get(id);
-    if (!note) return undefined;
-    
-    const now = new Date();
-    const updatedNote = { 
-      ...note, 
-      ...noteData,
-      updatedAt: now
-    };
-    this.notesMap.set(id, updatedNote);
-    return updatedNote;
-  }
-  
-  async deleteNote(id: number): Promise<boolean> {
-    return this.notesMap.delete(id);
-  }
-  
-  // Coupons methods
-  async getAllCoupons(): Promise<Coupon[]> {
-    return Array.from(this.couponsMap.values());
+
+  // Coupon methods
+  async createCoupon(insertCoupon: InsertCoupon): Promise<Coupon> {
+    const id = this.couponCurrentId++;
+    const coupon: Coupon = { ...insertCoupon, id };
+    this.coupons.set(id, coupon);
+    return coupon;
   }
   
   async getCouponByCode(code: string): Promise<Coupon | undefined> {
-    return Array.from(this.couponsMap.values()).find(
-      (coupon) => coupon.code === code
-    );
-  }
-  
-  async createCoupon(coupon: InsertCoupon): Promise<Coupon> {
-    const id = this.currentCouponId++;
-    const now = new Date();
-    const newCoupon: Coupon = {
-      ...coupon,
-      id,
-      createdAt: now
-    };
-    this.couponsMap.set(id, newCoupon);
-    return newCoupon;
-  }
-  
-  async updateCoupon(id: number, couponData: Partial<Coupon>): Promise<Coupon | undefined> {
-    const coupon = this.couponsMap.get(id);
-    if (!coupon) return undefined;
-    
-    const updatedCoupon = { ...coupon, ...couponData };
-    this.couponsMap.set(id, updatedCoupon);
-    return updatedCoupon;
-  }
-  
-  async deleteCoupon(id: number): Promise<boolean> {
-    return this.couponsMap.delete(id);
+    return Array.from(this.coupons.values())
+      .find(coupon => coupon.code === code && coupon.isActive);
   }
 }
 

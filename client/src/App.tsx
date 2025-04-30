@@ -5,41 +5,41 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
-import { ThemeProvider } from "next-themes";
 
-import NotFound from "@/pages/not-found";
+// Pages
+import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
-import Dashboard from "@/pages/dashboard";
-import ChatAssistant from "@/pages/chat-assistant";
-import DiagnosisTool from "@/pages/diagnosis-tool";
-import QuizGenerator from "@/pages/quiz-generator";
-import NeetPgPrep from "@/pages/neet-pg-prep";
-import MemoryBooster from "@/pages/memory-booster";
-import CaseGenerator from "@/pages/case-generator";
-import DrugAssistant from "@/pages/drug-assistant";
-import StudyPlanner from "@/pages/study-planner";
-import NotesMaker from "@/pages/notes-maker";
-import MedicalNews from "@/pages/medical-news";
-import HelpSupport from "@/pages/help-support";
-import Settings from "@/pages/settings";
+import AiChatPage from "@/pages/ai-chat-page";
+import DiagnosisToolPage from "@/pages/diagnosis-tool-page";
+import QuizGeneratorPage from "@/pages/quiz-generator-page";
+import NeetPgPage from "@/pages/neet-pg-page";
+import MemoryBoosterPage from "@/pages/memory-booster-page";
+import CaseGeneratorPage from "@/pages/case-generator-page";
+import DrugAssistantPage from "@/pages/drug-assistant-page";
+import StudyPlannerPage from "@/pages/study-planner-page";
+import NotesMakerPage from "@/pages/notes-maker-page";
+import MedFeedPage from "@/pages/med-feed-page";
+import HelpSupportPage from "@/pages/help-support-page";
+import AdminPage from "@/pages/admin-page";
+import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
-      <ProtectedRoute path="/" component={Dashboard} />
-      <ProtectedRoute path="/chat" component={ChatAssistant} />
-      <ProtectedRoute path="/diagnosis" component={DiagnosisTool} />
-      <ProtectedRoute path="/quiz" component={QuizGenerator} />
-      <ProtectedRoute path="/neetpg" component={NeetPgPrep} />
-      <ProtectedRoute path="/memory" component={MemoryBooster} />
-      <ProtectedRoute path="/cases" component={CaseGenerator} />
-      <ProtectedRoute path="/drugs" component={DrugAssistant} />
-      <ProtectedRoute path="/planner" component={StudyPlanner} />
-      <ProtectedRoute path="/notes" component={NotesMaker} />
-      <ProtectedRoute path="/news" component={MedicalNews} />
-      <ProtectedRoute path="/help" component={HelpSupport} />
-      <ProtectedRoute path="/settings" component={Settings} />
+      <ProtectedRoute path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
+      <ProtectedRoute path="/ai-chat" component={AiChatPage} />
+      <ProtectedRoute path="/diagnosis-tool" component={DiagnosisToolPage} />
+      <ProtectedRoute path="/quiz-generator" component={QuizGeneratorPage} />
+      <ProtectedRoute path="/neet-pg" component={NeetPgPage} />
+      <ProtectedRoute path="/memory-booster" component={MemoryBoosterPage} />
+      <ProtectedRoute path="/case-generator" component={CaseGeneratorPage} />
+      <ProtectedRoute path="/drug-assistant" component={DrugAssistantPage} />
+      <ProtectedRoute path="/study-planner" component={StudyPlannerPage} />
+      <ProtectedRoute path="/notes-maker" component={NotesMakerPage} />
+      <ProtectedRoute path="/med-feed" component={MedFeedPage} />
+      <ProtectedRoute path="/help-support" component={HelpSupportPage} />
+      <ProtectedRoute path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -48,14 +48,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light">
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </AuthProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
