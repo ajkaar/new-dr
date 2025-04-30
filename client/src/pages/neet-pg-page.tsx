@@ -93,7 +93,7 @@ type MockTestFormValues = z.infer<typeof mockTestSchema>;
 // Question interface
 interface QuizQuestion {
   question: string;
-  options: { A: string; B: string; C: string; D: string; };
+  options: { [key: string]: string };
   correctAnswer: string;
   explanation: string;
 }
@@ -921,7 +921,7 @@ const NeetPgPage: React.FC = () => {
                             {letter}.
                           </div>
                           <div className="text-sm">
-                            {mockTest[currentQuestion]?.options[letter as keyof typeof mockTest[currentQuestion].options]}
+                            {mockTest[currentQuestion]?.options?.[letter as string] || ''}
                           </div>
                         </Label>
                       </div>
@@ -933,20 +933,20 @@ const NeetPgPage: React.FC = () => {
                 {testEndTime && (
                   <div className="px-6 py-4 bg-gray-50 border-t">
                     <div className="flex items-center space-x-2 mb-2">
-                      {selectedAnswers[currentQuestion] === mockTest[currentQuestion].correctAnswer ? (
+                      {selectedAnswers[currentQuestion] === mockTest[currentQuestion]?.correctAnswer ? (
                         <CheckCircle2 className="h-5 w-5 text-green-600" />
                       ) : (
                         <XCircle className="h-5 w-5 text-red-600" />
                       )}
                       <h3 className="font-medium">
-                        {selectedAnswers[currentQuestion] === mockTest[currentQuestion].correctAnswer
+                        {selectedAnswers[currentQuestion] === mockTest[currentQuestion]?.correctAnswer
                           ? "Correct!"
                           : "Incorrect"}
                       </h3>
                     </div>
                     <div className="text-sm">
-                      <p className="font-medium mb-1">Correct Answer: {mockTest[currentQuestion].correctAnswer}</p>
-                      <p>{mockTest[currentQuestion].explanation}</p>
+                      <p className="font-medium mb-1">Correct Answer: {mockTest[currentQuestion]?.correctAnswer}</p>
+                      <p>{mockTest[currentQuestion]?.explanation}</p>
                     </div>
                   </div>
                 )}
@@ -1097,7 +1097,7 @@ const NeetPgPage: React.FC = () => {
                               ? 'border-primary bg-primary-50' 
                               : selectedAnswers[index] !== undefined
                               ? testEndTime
-                                ? selectedAnswers[index] === mockTest[index].correctAnswer
+                                ? selectedAnswers[index] === mockTest[index]?.correctAnswer
                                   ? 'bg-green-50 border-green-200'
                                   : 'bg-red-50 border-red-200'
                                 : 'bg-gray-100'

@@ -52,7 +52,7 @@ type FormValues = z.infer<typeof formSchema>;
 // Quiz question interface
 interface QuizQuestion {
   question: string;
-  options: { A: string; B: string; C: string; D: string; };
+  options: { [key: string]: string };
   correctAnswer: string;
   explanation: string;
 }
@@ -74,8 +74,19 @@ const QuizGeneratorPage: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   
+  interface QuizHistoryItem {
+  id: number;
+  subject: string;
+  topic: string;
+  difficulty: string;
+  score: number;
+  totalQuestions: number;
+  timeTaken: number;
+  completedAt: string;
+}
+
   // Get quiz history
-  const { data: quizHistory } = useQuery({
+  const { data: quizHistory = [] } = useQuery<QuizHistoryItem[]>({
     queryKey: ['/api/quiz/history'],
     enabled: !!user,
   });
@@ -292,7 +303,7 @@ const QuizGeneratorPage: React.FC = () => {
 
   // Get the current question's letter options (A, B, C, D)
   const getOptionLetters = () => {
-    return Object.keys(quizQuestions[currentQuestion]?.options || {});
+    return quizQuestions[currentQuestion]?.options ? Object.keys(quizQuestions[currentQuestion].options) : [];
   };
 
   // Format quiz time
@@ -600,9 +611,9 @@ const QuizGeneratorPage: React.FC = () => {
                         <Label 
                           htmlFor={`option-${letter}`}
                           className={`flex-1 cursor-pointer space-y-1 rounded-md p-2 hover:bg-accent ${
-                            quizEndTime && letter === quizQuestions[currentQuestion].correctAnswer
+                            quizEndTime && letter === quizQuestions[currentQuestion]?.correctAnswer
                               ? 'bg-green-50 text-green-900'
-                              : quizEndTime && selectedAnswers[currentQuestion] === letter && letter !== quizQuestions[currentQuestion].correctAnswer
+                              : quizEndTime && selectedAnswers[currentQuestion] === letter && letter !== quizQuestions[currentQuestion]?.correctAnswer
                               ? 'bg-red-50 text-red-900'
                               : ''
                           }`}
@@ -611,7 +622,7 @@ const QuizGeneratorPage: React.FC = () => {
                             {letter}.
                           </div>
                           <div className="text-sm">
-                            {quizQuestions[currentQuestion]?.options[letter as keyof typeof quizQuestions[currentQuestion].options]}
+                            {quizQuestions[currentQuestion]?.options?.[letter as string] || ''}
                           </div>
                         </Label>
                       </div>
@@ -623,20 +634,20 @@ const QuizGeneratorPage: React.FC = () => {
                 {(showExplanation || quizEndTime) && (
                   <div className="px-6 py-4 bg-gray-50 border-t">
                     <div className="flex items-center space-x-2 mb-2">
-                      {selectedAnswers[currentQuestion] === quizQuestions[currentQuestion].correctAnswer ? (
+                      {selectedAnswers[currentQuestion] === quizQuestions[currentQuestion]?.correctAnswer ? (
                         <CheckCircle2 className="h-5 w-5 text-green-600" />
                       ) : (
                         <XCircle className="h-5 w-5 text-red-600" />
                       )}
                       <h3 className="font-medium">
-                        {selectedAnswers[currentQuestion] === quizQuestions[currentQuestion].correctAnswer
+                        {selectedAnswers[currentQuestion] === quizQuestions[currentQuestion]?.correctAnswer
                           ? "Correct!"
                           : "Incorrect"}
                       </h3>
                     </div>
                     <div className="text-sm">
-                      <p className="font-medium mb-1">Correct Answer: {quizQuestions[currentQuestion].correctAnswer}</p>
-                      <p>{quizQuestions[currentQuestion].explanation}</p>
+                      <p className="font-medium mb-1">Correct Answer: {quizQuestions[currentQuestion]?.correctAnswer}</p>
+                      <p>{quizQuestions[currentQuestion]?.explanation}</p>
                     </div>
                   </div>
                 )}
