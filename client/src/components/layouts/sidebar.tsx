@@ -15,9 +15,9 @@ import {
   FileText, 
   Newspaper,
   Crown,
-  X,
-  Volume2
+  X
 } from 'lucide-react';
+import { VolumeIcon } from '@/components/icons/volume-icon';
 
 interface SidebarProps {
   mobile?: boolean;
@@ -34,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const navigationItems = [
     { path: '/', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
     { path: '/ai-chat', label: 'AI Chatbot', icon: <Bot className="h-5 w-5" /> },
-    { path: '/voice-assistant', label: 'Voice Assistant', icon: <Volume2 className="h-5 w-5" /> },
+    { path: '/voice-assistant', label: 'Voice Assistant', icon: <VolumeIcon className="h-5 w-5" /> },
     { path: '/diagnosis-tool', label: 'Diagnosis Tool', icon: <Stethoscope className="h-5 w-5" /> },
     { path: '/quiz-generator', label: 'Quiz Generator', icon: <HelpCircle className="h-5 w-5" /> },
     { path: '/neet-pg', label: 'NEET PG Prep', icon: <BookOpen className="h-5 w-5" /> },
@@ -78,9 +78,9 @@ const Sidebar: React.FC<SidebarProps> = ({
               <Link 
                 key={item.path} 
                 href={item.path}
-                onClick={mobile && closeSidebar}
+                onClick={() => mobile && closeSidebar && closeSidebar()}
               >
-                <a className={`
+                <div className={`
                   flex items-center px-4 py-3 text-sm font-medium rounded-md group
                   ${isActive 
                     ? 'text-white bg-primary' 
@@ -91,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {item.icon}
                   </span>
                   {item.label}
-                </a>
+                </div>
               </Link>
             );
           })}
@@ -99,9 +99,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* Help & Support link at the bottom */}
           <Link 
             href="/help-support"
-            onClick={mobile && closeSidebar}
+            onClick={() => mobile && closeSidebar && closeSidebar()}
           >
-            <a className={`
+            <div className={`
               flex items-center px-4 py-3 text-sm font-medium rounded-md group mt-4 border-t border-gray-100 pt-4
               ${location === '/help-support' 
                 ? 'text-white bg-primary' 
@@ -112,7 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <HelpCircle className="h-5 w-5" />
               </span>
               Help & Support
-            </a>
+            </div>
           </Link>
         </nav>
         

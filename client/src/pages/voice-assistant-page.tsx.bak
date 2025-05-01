@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, MessageSquare, Play, Pause, Loader2, HelpCircle } from 'lucide-react';
+import { Mic, MicOff, Volume2, Play, Pause, MessageSquare, BookOpen, Stethoscope, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,7 +9,6 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import AppLayout from '@/components/layouts/app-layout';
-import { VolumeIcon } from '@/components/icons/volume-icon';
 
 // Sample conversation history (would come from API in real app)
 const sampleHistory = [
@@ -231,7 +230,7 @@ const VoiceAssistantPage: React.FC = () => {
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <VolumeIcon className="mr-2 h-5 w-5 text-primary" />
+                  <Volume2 className="mr-2 h-5 w-5 text-primary" />
                   Voice Interaction
                 </CardTitle>
                 <CardDescription>
@@ -355,7 +354,7 @@ const VoiceAssistantPage: React.FC = () => {
                           
                           <div className="flex items-start gap-3">
                             <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center">
-                              <VolumeIcon className="h-4 w-4" />
+                              <Volume2 className="h-4 w-4" />
                             </div>
                             <div className="flex-1">
                               <p className="text-sm font-medium">Assistant response:</p>
@@ -378,7 +377,7 @@ const VoiceAssistantPage: React.FC = () => {
                       
                       {commandResults.length === 0 && (
                         <div className="text-center py-12">
-                          <VolumeIcon className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                          <Volume2 className="mx-auto h-12 w-12 text-muted-foreground/50" />
                           <h3 className="mt-4 text-lg font-medium">No interactions yet</h3>
                           <p className="mt-2 text-sm text-muted-foreground">
                             Use the voice command feature to start a conversation
@@ -391,44 +390,78 @@ const VoiceAssistantPage: React.FC = () => {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader>
-                <CardTitle>Command Examples</CardTitle>
-                <CardDescription>
-                  Click on any example to use it as your command
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {commandExamples.map((example, index) => (
-                    <Button 
-                      key={index}
-                      variant="ghost" 
-                      className="w-full justify-start text-left h-auto py-2"
-                      onClick={() => useExample(example)}
-                      disabled={isListening || isProcessing}
-                    >
-                      <span className="mr-2 text-xs text-muted-foreground">#{index + 1}</span>
-                      {example}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-              <CardFooter className="flex flex-col items-start space-y-4">
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Voice Commands Tips</h4>
-                  <ul className="text-sm space-y-1 list-disc pl-4 text-muted-foreground">
-                    <li>Speak clearly and use medical terminology</li>
-                    <li>Ask specific questions for better results</li>
-                    <li>Include the topic or subject area in your question</li>
-                    <li>For mnemonics, specify "create a mnemonic for..."</li>
+            <div className="space-y-6">
+              {/* Tips and Examples */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Voice Command Examples</CardTitle>
+                  <CardDescription>
+                    Try these examples to get started
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {commandExamples.map((example, index) => (
+                      <li key={index}>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start text-left h-auto py-2 px-3"
+                          onClick={() => useExample(example)}
+                        >
+                          <span className="text-sm">{example}</span>
+                        </Button>
+                      </li>
+                    ))}
                   </ul>
-                </div>
-                <p className="text-xs text-muted-foreground mt-4">
-                  Not all features may be available in every browser. The voice assistant works best in Chrome.
-                </p>
-              </CardFooter>
-            </Card>
+                </CardContent>
+              </Card>
+              
+              {/* AI Features */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Voice Assistant Features</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 text-primary">
+                        <BookOpen className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium">Medical Explanations</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Get detailed explanations of medical concepts and physiological processes
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 text-primary">
+                        <Stethoscope className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium">Clinical Scenarios</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Practice with clinical case discussions and diagnostic reasoning
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 text-primary">
+                        <Sparkles className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium">Study Tools</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Generate mnemonics, flashcards, quizzes, and other study aids on demand
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </TabsContent>
         
@@ -437,30 +470,31 @@ const VoiceAssistantPage: React.FC = () => {
             <CardHeader>
               <CardTitle>Conversation History</CardTitle>
               <CardDescription>
-                Review your past conversations with the voice assistant
+                Review and continue previous voice assistant conversations
               </CardDescription>
             </CardHeader>
             <CardContent>
               {sampleHistory.length > 0 ? (
                 <div className="space-y-6">
-                  {sampleHistory.map((item) => (
-                    <div key={item.id} className="border rounded-lg p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium">{item.title}</h3>
-                        <Badge variant="outline">
-                          {new Date(item.date).toLocaleDateString()}
-                        </Badge>
+                  {sampleHistory.map((conversation) => (
+                    <div key={conversation.id} className="flex flex-col sm:flex-row gap-4 sm:items-center p-4 rounded-lg border hover:bg-accent/50 transition-colors">
+                      <div className="sm:w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                        <Volume2 className="h-6 w-6" />
                       </div>
-                      <p className="text-sm text-muted-foreground">{item.summary}</p>
-                      <div className="flex justify-end gap-2 mt-4">
-                        <Button variant="outline" size="sm">
-                          <Play className="mr-2 h-3 w-3" />
-                          Play
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          View Details
-                        </Button>
+                      
+                      <div className="flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
+                          <h3 className="font-medium">{conversation.title}</h3>
+                          <Badge variant="outline" className="w-fit">
+                            {new Date(conversation.date).toLocaleDateString()}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{conversation.summary}</p>
                       </div>
+                      
+                      <Button variant="outline" size="sm" className="shrink-0 mt-2 sm:mt-0">
+                        Continue
+                      </Button>
                     </div>
                   ))}
                 </div>
