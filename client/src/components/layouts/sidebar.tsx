@@ -15,7 +15,8 @@ import {
   FileText, 
   Newspaper,
   Crown,
-  X
+  X,
+  Volume2
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -33,6 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const navigationItems = [
     { path: '/', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
     { path: '/ai-chat', label: 'AI Chatbot', icon: <Bot className="h-5 w-5" /> },
+    { path: '/voice-assistant', label: 'Voice Assistant', icon: <Volume2 className="h-5 w-5" /> },
     { path: '/diagnosis-tool', label: 'Diagnosis Tool', icon: <Stethoscope className="h-5 w-5" /> },
     { path: '/quiz-generator', label: 'Quiz Generator', icon: <HelpCircle className="h-5 w-5" /> },
     { path: '/neet-pg', label: 'NEET PG Prep', icon: <BookOpen className="h-5 w-5" /> },

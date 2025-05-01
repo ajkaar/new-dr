@@ -13,6 +13,7 @@ import DiagnosisToolPage from "@/pages/diagnosis-tool-page";
 import QuizGeneratorPage from "@/pages/quiz-generator-page";
 import NeetPgPage from "@/pages/neet-pg-page";
 import MemoryBoosterPage from "@/pages/memory-booster-page";
+import VoiceAssistantPage from "@/pages/voice-assistant-page";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/quiz-generator" component={QuizGeneratorPage} />
       <Route path="/neet-pg" component={NeetPgPage} />
       <Route path="/memory-booster" component={MemoryBoosterPage} />
+      <Route path="/voice-assistant" component={VoiceAssistantPage} />
       <Route component={NotFound} />
     </Switch>
   );
