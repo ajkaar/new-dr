@@ -31,10 +31,29 @@ export async function getDiagnosis(symptoms: string) {
 
 // Quiz Generator
 export async function generateQuiz(subject: string, topic: string, difficulty: string, numQuestions: number) {
-  const response = await apiRequest("POST", "/api/quiz", { 
-    subject, topic, difficulty, numQuestions 
+  const response = await fetch('http://127.0.0.1:5000/generate-questions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ subject, topic, difficulty, numQuestions })
   });
-  return await response.json();
+
+  const data = await response.json();
+  
+  // Transform the response format to match expected structure
+  return {
+    quiz: {
+      questions: data.questions.map((q: any, index: number) => ({
+        question: q.question,
+        options: Object.fromEntries(
+          q.options.map((opt: string) => [opt.charAt(0), opt.slice(3)])
+        ),
+        correctAnswer: "A", // You'll need to modify this based on your Python response
+        explanation: "Explanation will be added", // You'll need to modify this based on your Python response
+      }))
+    }
+  };
 }
 
 // Submit Quiz Attempt
