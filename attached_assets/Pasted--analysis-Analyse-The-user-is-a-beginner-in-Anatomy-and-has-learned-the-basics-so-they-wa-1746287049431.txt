@@ -1,0 +1,95 @@
+{
+    "analysis": "Analyse: The user is a beginner in Anatomy and has learned the basics, so they want to prepare for NEET PG.\n\nPlan: For a beginner in Anatomy, I should first ask 3 questions of difficulty level 1 on a scale of 1 to 10, followed by 3 questions of difficulty level 2-3, and then 4 questions of difficulty level 4-5, ensuring that all questions are relevant to NEET PG.\n\nWork: For questions of difficulty 1/10, a beginner student of Anatomy should know about basic anatomical terminology, the major body systems, and simple skeletal anatomy. For questions of difficulty 2/10, a beginner should know about the major functions of different systems and identification of structures on the human body. For questions of difficulty 4-5/10, a beginner should know about specific anatomical relationships and clinical correlations.\n\n",
+    "questions": [
+        {
+            "options": [
+                "A) Anterior",
+                "B) Posterior",
+                "C) Lateral",
+                "D) Medial"
+            ],
+            "question": "1. What is the anatomical term for the front of the body?"
+        },
+        {
+            "options": [
+                "A) Humerus",
+                "B) Femur",
+                "C) Skull",
+                "D) Scapula"
+            ],
+            "question": "2. Which of the following bones is part of the axial skeleton?"
+        },
+        {
+            "options": [
+                "A) Diaphragm",
+                "B) Intercostal muscles",
+                "C) Rib cage",
+                "D) Abdominal muscles"
+            ],
+            "question": "3. Which structure separates the thoracic cavity from the abdominal cavity?"
+        },
+        {
+            "options": [
+                "A) Abdominal cavity",
+                "B) Thoracic cavity",
+                "C) Pelvic cavity",
+                "D) Cranial cavity"
+            ],
+            "question": "4. The heart is located in which part of the body?"
+        },
+        {
+            "options": [
+                "A) Hormone production",
+                "B) Support and protection of internal organs",
+                "C) Regulation of body temperature",
+                "D) Facilitation of movement"
+            ],
+            "question": "5. Which of the following is the primary function of the skeletal system?"
+        },
+        {
+            "options": [
+                "A) Trachea",
+                "B) Larynx",
+                "C) Pharynx",
+                "D) Esophagus"
+            ],
+            "question": "6. Which structure is commonly referred to as the voice box?"
+        },
+        {
+            "options": [
+                "A) Cerebrum",
+                "B) Cerebellum",
+                "C) Brainstem",
+                "D) Hypothalamus"
+            ],
+            "question": "7. Which part of the brain is responsible for coordination and balance?"
+        },
+        {
+            "options": [
+                "A) Left upper quadrant",
+                "B) Right upper quadrant",
+                "C) Left lower quadrant",
+                "D) Right lower quadrant"
+            ],
+            "question": "8. The liver is located in which quadrant of the abdomen?"
+        },
+        {
+            "options": [
+                "A) Brain",
+                "B) Heart",
+                "C) Liver",
+                "D) Skin"
+            ],
+            "question": "9. What is the largest organ in the human body?"
+        },
+        {
+            "options": [
+                "A) Triceps brachii",
+                "B) Biceps brachii",
+                "C) Deltoid",
+                "D) Pectoralis major"
+            ],
+            "question": "10. Which muscle is primarily responsible for the flexion of the elbow?"
+        }
+    ]
+}
