@@ -286,7 +286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Exam name, total days, and subjects are required" });
       }
       
-      const response = await generateStudyPlan(timeLeft, 8, subjects, "", new Date());
+      const response = await generateStudyPlan(totalDays, hoursPerDay, subjects, weakTopics, startDate);
       
       // Update user token usage
       const user = req.user as Express.User;
