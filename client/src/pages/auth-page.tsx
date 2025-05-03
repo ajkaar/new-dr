@@ -35,6 +35,7 @@ const registerSchema = z.object({
   username: z.string().min(3, { message: 'Username must be at least 3 characters' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
+  mobile: z.string().min(10, { message: 'Please enter a valid mobile number' }),
   fullName: z.string().min(3, { message: 'Full name is required' }),
 });
 
@@ -172,6 +173,20 @@ const AuthPage: React.FC = () => {
                           <FormLabel>Email</FormLabel>
                           <FormControl>
                             <Input type="email" placeholder="Enter your email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={registerForm.control}
+                      name="mobile"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mobile Number</FormLabel>
+                          <FormControl>
+                            <Input type="tel" placeholder="Enter your mobile number" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
