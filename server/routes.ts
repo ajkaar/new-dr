@@ -297,8 +297,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const planContent = JSON.parse(response.text);
       const studyPlan = await storage.createStudyPlan({
         userId: user.id,
-        goalExam,
-        timeLeft,
+        examName,
+        totalDays,
         subjects,
         plan: planContent
       });

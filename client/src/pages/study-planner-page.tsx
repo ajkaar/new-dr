@@ -64,7 +64,7 @@ export default function StudyPlannerPage() {
           hoursPerDay: parseInt(hoursPerDay),
           subjects: selectedSubjects,
           weakTopics,
-          startDate: date.toISOString()
+          startDate: new Date(date).toISOString()
         }),
       });
 
