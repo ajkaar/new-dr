@@ -13,6 +13,51 @@ import {
   generateNotes
 } from "./ai-service";
 
+// Notes API endpoints
+router.post('/api/notes/generate', authenticate, async (req, res) => {
+  try {
+    const { topic, noteStyle, language } = req.body;
+    const response = await generateNotes(topic, noteStyle, language);
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to generate notes" });
+  }
+});
+
+router.post('/api/notes/save', authenticate, async (req, res) => {
+  try {
+    const { topic, content, style, language } = req.body;
+    const note = await storage.createNote({
+      userId: req.user.id,
+      topic,
+      content,
+      style,
+      language
+    });
+    res.json({ note });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to save note" });
+  }
+});
+
+router.get('/api/notes/history', authenticate, async (req, res) => {
+  try {
+    const notes = await storage.getNotesByUserId(req.user.id);
+    res.json({ notes });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch notes" });
+  }
+});
+
+router.delete('/api/notes/:id', authenticate, async (req, res) => {
+  try {
+    await storage.deleteNote(req.params.id, req.user.id);
+    res.json({ message: "Note deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete note" });
+  }
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes (/api/register, /api/login, /api/logout, /api/user)
   setupAuth(app);
