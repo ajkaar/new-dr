@@ -193,12 +193,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
       
-      const { speciality, difficulty } = req.body;
-      if (!speciality || !difficulty) {
-        return res.status(400).json({ message: "Speciality and difficulty are required" });
+      const { specialty, difficulty } = req.body;
+      if (!specialty || !difficulty) {
+        return res.status(400).json({ message: "Specialty and difficulty are required" });
       }
       
-      const response = await generateCaseStudy(speciality, difficulty);
+      const response = await generateCaseStudy(specialty, difficulty);
       
       // Update user token usage
       const user = req.user as Express.User;
@@ -211,7 +211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: user.id,
         title: caseContent.title || `${speciality} Case Study`,
         content: caseContent,
-        speciality,
+        specialty,
         difficulty
       });
       
