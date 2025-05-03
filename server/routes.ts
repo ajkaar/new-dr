@@ -187,7 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Case Generator
-  app.post("/api/case", async (req, res, next) => {
+  app.post("/api/case/generate", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ message: "Unauthorized" });
