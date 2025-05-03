@@ -1,3 +1,20 @@
+
+export async function generateCase(specialty: string, difficulty: string) {
+  const response = await fetch('/api/case', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ specialty, difficulty }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to generate case');
+  }
+
+  return response.json();
+}
+
 import { apiRequest } from "./queryClient";
 
 // AI Chatbot

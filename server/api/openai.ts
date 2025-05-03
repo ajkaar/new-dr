@@ -372,7 +372,58 @@ export async function handleCaseGeneratorRequest(req: Request, res: Response) {
     
     const specialtyPrompt = specialty ? ` related to ${specialty}` : "";
     
-    const prompt = `Generate a realistic clinical case study${specialtyPrompt} that would be relevant for Indian medical students. Include patient history, examination findings, relevant investigations, and questions to think about. Format as JSON with: "title", "patientProfile", "history", "examination", "investigations", "differentialDiagnosis", "questions" (array).`;
+    const prompt = `Generate an interactive clinical case study${specialtyPrompt} that would be relevant for Indian medical students preparing for NEET PG, AIIMS, etc. Format as JSON with:
+{
+  "title": "Case title",
+  "difficulty": "UG/PG level",
+  "specialty": "Medical specialty",
+  "steps": [
+    {
+      "type": "chiefComplaint",
+      "content": "Initial presentation",
+      "question": "What is your initial impression?",
+      "expectedAnswer": "Key points to consider",
+      "clinicalPearls": ["Important tips"]
+    },
+    {
+      "type": "history",
+      "content": "Detailed history",
+      "question": "What additional history would you like to know?",
+      "expectedAnswer": "Important history elements",
+      "clinicalPearls": ["History taking tips"]
+    },
+    {
+      "type": "examination",
+      "content": "Physical examination findings",
+      "question": "What are the significant findings?",
+      "expectedAnswer": "Key examination findings",
+      "clinicalPearls": ["Examination tips"]
+    },
+    {
+      "type": "investigations",
+      "content": "Investigation results",
+      "question": "What is your interpretation?",
+      "expectedAnswer": "Interpretation of results",
+      "clinicalPearls": ["Investigation pearls"]
+    },
+    {
+      "type": "diagnosis",
+      "question": "What is your final diagnosis?",
+      "expectedAnswer": "Final diagnosis with reasoning",
+      "differentials": ["Alternative diagnoses"],
+      "clinicalPearls": ["Diagnostic pearls"]
+    },
+    {
+      "type": "management",
+      "question": "Outline your management plan",
+      "expectedAnswer": "Detailed management plan",
+      "clinicalPearls": ["Management tips"]
+    }
+  ],
+  "references": ["Key textbook references"],
+  "difficultyScore": 1-10,
+  "commonInExams": true/false
+}`;
     
     const estimatedInputTokens = estimateTokenCount(prompt);
     
