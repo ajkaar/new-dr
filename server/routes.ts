@@ -27,9 +27,13 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
 router.post('/api/notes/generate', authenticate, async (req, res) => {
   try {
     const { topic, noteStyle, language } = req.body;
+    if (!topic || !noteStyle || !language) {
+      return res.status(400).json({ message: "Missing required parameters" });
+    }
     const response = await generateNotes(topic, noteStyle, language);
-    res.json(response);
+    res.json({ text: response.text, relatedTopics: [] });
   } catch (error) {
+    console.error("Notes generation error:", error);
     res.status(500).json({ message: "Failed to generate notes" });
   }
 });

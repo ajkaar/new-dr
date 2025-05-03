@@ -232,22 +232,41 @@ export async function generateStudyPlan(
 
 export async function generateNotes(
   topic: string,
-  detail: string
+  style: string,
+  language: string = "Formal English"
 ): Promise<CompletionResponse> {
   const systemPrompt = `You are a medical educator specializing in creating concise, high-quality study notes for medical students.
-  Your notes should be comprehensive yet focused, with clear organization, key points highlighted, and include memory aids where appropriate.
+  Your notes should be in ${language} and follow the ${style} format.
   Base your content on standard medical textbooks and current guidelines.`;
   
-  const userPrompt = `Generate concise ${detail} study notes on ${topic}.
-  Structure the content with:
+  let structurePrompt = "";
+  switch (style) {
+    case "Bullet Points":
+      structurePrompt = `
+      1. Brief overview (2-3 bullet points)
+      2. Key concepts (5-7 concise bullet points)
+      3. Clinical relevance (3-4 bullet points)
+      4. High-yield points (4-5 bullet points)`;
+      break;
+    case "Mnemonics + Memory Aids":
+      structurePrompt = `
+      1. Brief topic overview
+      2. 2-3 memorable mnemonics
+      3. Visual memory aids or associations
+      4. Practice recall points`;
+      break;
+    default: // Detailed Explanation
+      structurePrompt = `
+      1. Comprehensive definition and background
+      2. Detailed explanation of mechanisms
+      3. Clinical applications
+      4. Key points to remember`;
+  }
   
-  1. A clear definition and brief overview (2-3 sentences)
-  2. 3-5 key concepts or mechanisms (use bullet points)
-  3. Brief clinical relevance (if applicable)
-  4. 1-2 memorable mnemonics or memory aids
-  5. 3-4 high-yield points to remember
+  const userPrompt = `Create study notes on "${topic}" using the following structure:
+  ${structurePrompt}
   
-  Format with proper headings (###) and bullet points. Keep each section focused and concise.`;
+  Format the response in ${language} with clear headings (###) and appropriate formatting.`;
   
   try {
     const response = await openai.chat.completions.create({
