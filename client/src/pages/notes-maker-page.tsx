@@ -28,6 +28,7 @@ export default function NotesMakerPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedNotes, setGeneratedNotes] = useState<string>("");
   const [savedNotes, setSavedNotes] = useState<Note[]>([]);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
   const [relatedTopics, setRelatedTopics] = useState<string[]>([]);
 
   useEffect(() => {
@@ -38,15 +39,19 @@ export default function NotesMakerPage() {
 
   const fetchSavedNotes = async () => {
     try {
+      setIsLoadingNotes(true);
       const response = await fetch('/api/notes/history');
       const data = await response.json();
-      setSavedNotes(data.notes);
+      setSavedNotes(data.notes || []);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to fetch saved notes",
         variant: "destructive"
       });
+      setSavedNotes([]);
+    } finally {
+      setIsLoadingNotes(false);
     }
   };
 
@@ -251,7 +256,15 @@ export default function NotesMakerPage() {
           </Card>
         )}
 
-        {savedNotes.length > 0 && (
+        {isLoadingNotes ? (
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            </CardContent>
+          </Card>
+        ) : savedNotes && savedNotes.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Saved Notes</CardTitle>
