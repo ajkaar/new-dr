@@ -1,7 +1,9 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
+
+const router = express.Router();
 import { 
   getAiChatResponse, 
   generateDiagnosis, 
@@ -61,6 +63,7 @@ router.delete('/api/notes/:id', authenticate, async (req, res) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes (/api/register, /api/login, /api/logout, /api/user)
   setupAuth(app);
+  app.use(router);
   
   // AI Chatbot
   app.post("/api/chat", async (req, res, next) => {
