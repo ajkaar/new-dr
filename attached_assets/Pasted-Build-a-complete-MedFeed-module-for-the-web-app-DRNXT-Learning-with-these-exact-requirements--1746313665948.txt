@@ -1,0 +1,138 @@
+Build a complete "MedFeed" module for the web app "DRNXT Learning" with these exact requirements:
+
+📲 Frontend (MedFeed Page): 1️⃣ Dynamic newsfeed page with:
+
+Page title: "MedFeed – Latest Medical News & Updates"
+
+News items in card format:
+
+Title (bold)
+
+AI-summarized short description (MAX 100 words)
+
+Source link: a clickable URL labeled "Read More"
+
+Timestamp (e.g., "2 hours ago")
+
+Category badge (Exam, Guidelines, Research, etc.)
+
+Optional thumbnail image.
+
+2️⃣ Filters & Sorting:
+
+Dropdown to filter news by category
+
+Sort by Most Recent / Most Popular
+
+3️⃣ Notifications:
+
+Real-time toast notifications for breaking news.
+
+4️⃣ Ads/Sponsored Posts:
+
+Every 5th item is a sponsored post/ad (admin-controlled).
+
+5️⃣ Bookmarks:
+
+Users can save/bookmark news and access them from their dashboard.
+
+⚙️ Backend & AI Scraping Engine:
+
+✅ Scraping Engine:
+
+AI-powered scraper that runs every 4–6 hours automatically.
+
+Scrapes from sources like:
+
+NMC (National Medical Commission)
+
+NEET PG official sites
+
+Indian medical news journals
+
+Govt medical research portals
+
+For each article, extract:
+
+Title
+
+Summary (auto-trimmed/summarized to under 100 words)
+
+Source URL
+
+Category (auto-classified)
+
+Timestamp
+
+Image (if available)
+
+✅ AI Cleanup:
+
+Use AI (GPT/Claude) to clean + summarize scraped text to max 100 words.
+
+✅ APIs:
+
+GET /api/news: Paginated news with filters.
+
+POST /api/news/scrape: (Admin-only) Trigger scraping manually.
+
+GET /api/news/:id: Full details of a news post.
+
+POST /api/news/bookmark: Bookmark news.
+
+GET /api/news/bookmarked: User’s saved news.
+
+✅ Database:
+
+Fields:
+
+id
+
+title
+
+summary (max 100 words)
+
+sourceUrl
+
+category
+
+image
+
+publishedAt
+
+isSponsored
+
+createdAt
+
+✅ Admin Panel:
+
+View/manage all scraped news.
+
+Add/edit sponsored posts.
+
+Push notifications to users.
+
+Trigger manual scraping.
+
+🔐 User Features:
+
+Save/bookmark news.
+
+View saved news in user dashboard.
+
+Get push notifications for breaking news.
+
+🛠️ Login & Signup:
+
+Email + Google OAuth.
+
+💡 Optional (Future Ready):
+
+Translation toggle (English/Hindi)
+
+Track news views for trending posts.
+
+✅ App Name: DRNXT Learning
+📰 Module Name: MedFeed (AI-Scraped News)
+🎯 Goal: Automatically scrape, summarize (max 100 words), and deliver medical news/updates to users, with source links and regular updates every 4–6 hours. Include bookmarking, notifications, admin ads, and source attribution.
+
