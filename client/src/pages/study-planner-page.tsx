@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 
 const MEDICAL_SUBJECTS = [
@@ -210,7 +210,8 @@ export default function StudyPlannerPage() {
                 variant="outline"
                 onClick={() => {
                   if (studyPlan) {
-                    toast({
+                    const { toast } = useToast();
+  toast({
                       title: "Progress",
                       description: `Current progress: ${progress}% completed`
                     });
