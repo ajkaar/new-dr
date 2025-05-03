@@ -238,13 +238,16 @@ export async function generateNotes(
   Your notes should be comprehensive yet focused, with clear organization, key points highlighted, and include memory aids where appropriate.
   Base your content on standard medical textbooks and current guidelines.`;
   
-  const userPrompt = `Generate ${detail} study notes on ${topic}.
-  Include:
-  1. Definition and overview
-  2. Key concepts and mechanisms
-  3. Clinical relevance
-  4. Mnemonics or memory aids where helpful
-  5. Important points to remember`;
+  const userPrompt = `Generate concise ${detail} study notes on ${topic}.
+  Structure the content with:
+  
+  1. A clear definition and brief overview (2-3 sentences)
+  2. 3-5 key concepts or mechanisms (use bullet points)
+  3. Brief clinical relevance (if applicable)
+  4. 1-2 memorable mnemonics or memory aids
+  5. 3-4 high-yield points to remember
+  
+  Format with proper headings (###) and bullet points. Keep each section focused and concise.`;
   
   try {
     const response = await openai.chat.completions.create({

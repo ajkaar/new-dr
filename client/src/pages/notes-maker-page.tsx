@@ -248,7 +248,24 @@ export default function NotesMakerPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-slate max-w-none dark:prose-invert prose-headings:text-primary prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-base prose-p:leading-7 prose-a:text-primary prose-strong:text-primary/90 prose-ul:list-disc prose-ol:list-decimal prose-li:my-1 prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300" dangerouslySetInnerHTML={{ __html: generatedNotes }} />
+              <div className="prose prose-slate max-w-none dark:prose-invert 
+                prose-headings:text-primary prose-headings:font-semibold prose-headings:mb-4 prose-headings:mt-6
+                prose-h1:text-3xl prose-h1:border-b prose-h1:pb-2 prose-h1:border-primary/20
+                prose-h2:text-2xl prose-h2:mt-8
+                prose-h3:text-xl 
+                prose-h4:text-lg
+                prose-p:text-base prose-p:leading-7 prose-p:my-4
+                prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                prose-strong:text-primary/90 prose-strong:font-semibold
+                prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-3
+                prose-ol:my-6 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-3
+                prose-li:my-0 prose-li:pl-2
+                prose-blockquote:border-l-4 prose-blockquote:border-primary/30 
+                prose-blockquote:pl-4 prose-blockquote:italic 
+                prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
+                prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg
+                [&>*:first-child]:mt-0 [&>*:last-child]:mb-0" 
+                dangerouslySetInnerHTML={{ __html: generatedNotes }} />
               
               {relatedTopics.length > 0 && (
                 <div className="mt-4">
