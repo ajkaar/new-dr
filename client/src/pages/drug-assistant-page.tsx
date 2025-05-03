@@ -103,26 +103,10 @@ export default function DrugAssistantPage() {
               <CardTitle>{drugName.toUpperCase()}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose max-w-none space-y-6">
-                {Object.entries(JSON.parse(drugInfo.drugInfo)).map(([key, value]: [string, any]) => {
-                  if (key === "tokenUsage") return null;
-                  return (
-                    <div key={key} className="space-y-2">
-                      <h3 className="text-lg font-semibold border-b pb-2">{key}</h3>
-                      {typeof value === 'string' ? (
-                        <div className="whitespace-pre-wrap text-sm">{value}</div>
-                      ) : (
-                        <ul className="list-disc list-inside">
-                          {Object.entries(value).map(([subKey, subValue]: [string, any]) => (
-                            <li key={subKey} className="text-sm">
-                              <strong>{subKey}:</strong> {subValue}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  );
-                })}
+              <div className="prose max-w-none">
+                <div className="whitespace-pre-wrap text-sm">
+                  {drugInfo.drugInfo}
+                </div>
               </div>
             </CardContent>
           </Card>
