@@ -8,7 +8,9 @@ import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookOpen, ArrowRight } from 'lucide-react';
+import { BookOpen, ArrowRight, Stethoscope } from 'lucide-react';
+import { generateCase } from '@/lib/ai-service';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CaseGeneratorPage() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -18,21 +20,22 @@ export default function CaseGeneratorPage() {
   const [difficulty, setDifficulty] = useState('moderate');
   const [caseData, setCaseData] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
 
   const handleGenerateCase = async () => {
     setIsGenerating(true);
     try {
-      const response = await fetch('/api/case/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ specialty, difficulty })
-      });
-      const data = await response.json();
-      setCaseData(data.case);
+      const response = await generateCase(specialty, difficulty);
+      setCaseData(response.case);
       setCurrentStep(0);
       setShowAnswer(false);
+      setUserAnswer('');
     } catch (error) {
-      console.error('Failed to generate case:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate case. Please try again.",
+        variant: "destructive"
+      });
     }
     setIsGenerating(false);
   };
@@ -96,7 +99,10 @@ export default function CaseGeneratorPage() {
             <Card>
               <CardHeader className="border-b">
                 <div className="flex justify-between items-center">
-                  <CardTitle>{caseData.title}</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Stethoscope className="h-5 w-5" />
+                    {caseData.title}
+                  </CardTitle>
                   <div className="flex items-center space-x-2 text-sm">
                     <span className="px-2 py-1 bg-primary/10 rounded">
                       {specialty}
