@@ -19,10 +19,15 @@ import CaseGeneratorPage from "@/pages/case-generator-page";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  // Redirect to auth if not logged in and not already on auth page
+  if (!user && window.location.pathname !== '/auth') {
+    return <Redirect to="/auth" />;
   }
 
   return (
