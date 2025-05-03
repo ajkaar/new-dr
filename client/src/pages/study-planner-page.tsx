@@ -274,22 +274,22 @@ export default function StudyPlannerPage() {
                             <div>
                               <div className="font-medium">{item.task}</div>
                               <div className="text-sm text-muted-foreground">
-                                {item.milestones.join(', ')}
+                                {item.milestones?.join(', ')}
                               </div>
                             </div>
                           </td>
                           <td className="p-3">
                             <ul className="list-disc list-inside text-sm">
-                              {item.subtopics.map((topic, i) => (
+                              {item.subtopics?.map((topic, i) => (
                                 <li key={i}>{topic}</li>
-                              ))}
+                              )) || 'No subtopics available'}
                             </ul>
                           </td>
                           <td className="p-3">
                             <ul className="list-disc list-inside text-sm">
-                              {item.resources.map((resource, i) => (
+                              {item.resources?.map((resource, i) => (
                                 <li key={i}>{resource}</li>
-                              ))}
+                              )) || 'No resources available'}
                             </ul>
                           </td>
                           <td className="p-3">{item.hours} hrs</td>
