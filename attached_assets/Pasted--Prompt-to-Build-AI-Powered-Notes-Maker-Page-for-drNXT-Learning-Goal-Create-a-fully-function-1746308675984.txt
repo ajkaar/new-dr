@@ -1,0 +1,122 @@
+🚀 Prompt to Build: AI-Powered Notes Maker Page for drNXT Learning
+
+✅ Goal:
+
+Create a fully functional AI-Powered Notes Maker page inside the drNXT Learning webapp.
+
+✅ Page Features:
+
+1️⃣ User Input Section:
+
+➔ Input field: Topic (e.g., "Type 2 Diabetes management")
+
+➔ Dropdown: Note Style Options:
+
+Concise Bullet Points
+
+Detailed Explanation
+
+Mnemonics + Memory Aids
+
+➔ Dropdown: Language Preference:
+
+Formal English
+
+Simplified English
+
+Hinglish (mix of Hindi-English)
+
+➔ Submit Button: "Generate Notes"
+
+2️⃣ AI Output Section:
+
+➔ Formatted Notes Display:
+
+Clean formatting: bullet points, bold headings, clear sections.
+
+➔ Features:
+
+Save Notes (to dashboard)
+
+Download as PDF
+
+"Regenerate" option (for a new version of the same topic)
+
+Optionally show related topics or "What to study next" hints.
+
+3️⃣ Past Notes Section:
+
+➔ Display previously generated notes (retrieved via API).
+
+➔ Allow delete or re-download.
+
+✅ UI/UX Notes:
+
+✨ Clean medical-themed design (blue/white).
+
+✨ Responsive layout.
+
+✨ Loading spinner during AI generation.
+
+✨ Notifications for save/download success.
+
+✨ Clear error handling if AI generation fails.
+
+✅ Authentication:
+
+Only logged-in users can use this feature (check user session).
+
+✅ Backend & API:
+
+POST /api/notes/generate:
+
+Input:
+
+json
+Copy
+Edit
+{
+  "topic": "Type 2 Diabetes",
+  "noteStyle": "Bullet Points",
+  "language": "Simplified English"
+}
+Response:
+
+json
+Copy
+Edit
+{
+  "notes": "<html-formatted notes block>",
+  "relatedTopics": ["Metabolic Syndrome", "Diabetes Complications"]
+}
+POST /api/notes/save:
+
+Save the notes to user’s dashboard.
+
+GET /api/notes/history:
+
+Retrieve user’s saved notes.
+
+✅ GPT Prompt (for the AI backend):
+
+css
+Copy
+Edit
+You are a medical education assistant for Indian MBBS/NEET PG students. Create exam-ready notes for the topic: {{topic}}. Format as per the {{noteStyle}} preference and write in {{language}}. Make it concise, accurate, and easy to understand. Add mnemonics if applicable. Keep it medically accurate and aligned with Indian curriculum (NMC guidelines).
+✅ Database:
+
+Table: notes
+
+id
+
+userId
+
+topic
+
+content
+
+style
+
+language
+
+createdAt
