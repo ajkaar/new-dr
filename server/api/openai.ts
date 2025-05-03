@@ -504,7 +504,16 @@ export async function handleDrugInfoRequest(req: Request, res: Response) {
       return res.status(400).json({ message: "Drug name is required" });
     }
     
-    const prompt = `Provide comprehensive information about the drug "${drugName}". Include drug class, mechanism of action, indications, contraindications, side effects, dosage, and important notes for medical students. Format as JSON with appropriate fields.`;
+    const prompt = `Provide comprehensive information about the drug "${drugName}" with a focus on Indian medical practice and guidelines. Include:
+1. Drug class and mechanism of action
+2. Approved indications in India
+3. Common clinical uses in Indian medical practice
+4. Standard dosing guidelines (as per Indian recommendations)
+5. Important adverse effects and safety concerns
+6. Drug interactions of clinical significance
+7. Contraindications
+8. Special considerations for Indian population
+Format the response in clear sections with educational notes relevant for Indian medical students.`;
     
     const estimatedInputTokens = estimateTokenCount(prompt);
     

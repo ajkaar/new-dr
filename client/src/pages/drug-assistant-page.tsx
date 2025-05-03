@@ -68,7 +68,7 @@ export default function DrugAssistantPage() {
   return (
     <AppLayout
       title="Drug Assistant"
-      description="Get detailed information about medications"
+      description="Get detailed information about medications based on Indian medical standards"
     >
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <Card>
@@ -100,12 +100,29 @@ export default function DrugAssistantPage() {
         {drugInfo && (
           <Card>
             <CardHeader>
-              <CardTitle>{drugName}</CardTitle>
+              <CardTitle>{drugName.toUpperCase()}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose max-w-none">
-                {/* Display drug information here */}
-                <pre className="whitespace-pre-wrap">{JSON.stringify(drugInfo, null, 2)}</pre>
+              <div className="prose max-w-none space-y-6">
+                {Object.entries(JSON.parse(drugInfo.drugInfo)).map(([key, value]: [string, any]) => {
+                  if (key === "tokenUsage") return null;
+                  return (
+                    <div key={key} className="space-y-2">
+                      <h3 className="text-lg font-semibold border-b pb-2">{key}</h3>
+                      {typeof value === 'string' ? (
+                        <div className="whitespace-pre-wrap text-sm">{value}</div>
+                      ) : (
+                        <ul className="list-disc list-inside">
+                          {Object.entries(value).map(([subKey, subValue]: [string, any]) => (
+                            <li key={subKey} className="text-sm">
+                              <strong>{subKey}:</strong> {subValue}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
