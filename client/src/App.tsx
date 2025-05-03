@@ -15,6 +15,7 @@ import QuizGeneratorPage from "@/pages/quiz-generator-page";
 import NeetPgPage from "@/pages/neet-pg-page";
 import MemoryBoosterPage from "@/pages/memory-booster-page";
 import VoiceAssistantPage from "@/pages/voice-assistant-page";
+import CaseGeneratorPage from "@/pages/case-generator-page";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/neet-pg" component={NeetPgPage} />
       <Route path="/memory-booster" component={MemoryBoosterPage} />
       <Route path="/voice-assistant" component={VoiceAssistantPage} />
+      <Route path="/case-generator" component={CaseGeneratorPage} />
       <Route component={NotFound} />
     </Switch>
   );
