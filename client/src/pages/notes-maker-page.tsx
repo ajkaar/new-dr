@@ -69,17 +69,35 @@ export default function NotesMakerPage() {
     try {
       const response = await fetch('/api/notes/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, noteStyle, language })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 
+          topic, 
+          noteStyle, 
+          language,
+          detail: noteStyle // Map style to detail level
+        })
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to generate notes');
+      }
+
       const data = await response.json();
-      setGeneratedNotes(data.notes);
-      setRelatedTopics(data.relatedTopics || []);
+      
+      if (data.text) {
+        setGeneratedNotes(data.text);
+        setRelatedTopics(data.relatedTopics || []);
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
+      console.error('Failed to generate notes:', error);
       toast({
         title: "Error",
-        description: "Failed to generate notes",
+        description: "Failed to generate notes. Please try again.",
         variant: "destructive"
       });
     } finally {
