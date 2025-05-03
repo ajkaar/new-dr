@@ -74,21 +74,34 @@ export default function StudyPlannerPage() {
   const handleGeneratePlan = async () => {
     setIsGenerating(true);
     try {
-      const response = await createStudyPlan(
-        "NEET PG",
-        parseInt(totalDays),
-        parseInt(hoursPerDay),
-        selectedSubjects,
-        weakTopics,
-        date
-      );
+      try {
+        const response = await fetch('/api/study-plan', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            examName: "NEET PG",
+            totalDays: parseInt(totalDays),
+            hoursPerDay: parseInt(hoursPerDay),
+            subjects: selectedSubjects,
+            weakTopics,
+            startDate: date.toISOString()
+          }),
+        });
 
-      if (response.studyPlan) {
-        setStudyPlan(response.studyPlan);
-        // Update weekly plan with the new plan
-        setWeeklyPlan(response.studyPlan.plan.map(item => ({
+        if (!response.ok) {
+          throw new Error('Failed to generate study plan');
+        }
+
+        const data = await response.json();
+        setStudyPlan(data.studyPlan);
+        setWeeklyPlan(data.studyPlan.plan.map((item: any) => ({
           date: item.date,
           task: item.task,
+          subtopics: item.subtopics || [],
+          resources: item.resources || [],
+          milestones: item.milestones || [],
           hours: item.hours,
           done: false
         })));

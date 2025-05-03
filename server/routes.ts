@@ -281,9 +281,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
       
-      const { goalExam, timeLeft, subjects } = req.body;
-      if (!goalExam || !timeLeft || !subjects || !Array.isArray(subjects)) {
-        return res.status(400).json({ message: "Goal exam, timeLeft, and subjects are required" });
+      const { examName, totalDays, hoursPerDay, subjects, weakTopics, startDate } = req.body;
+      if (!examName || !totalDays || !subjects || !Array.isArray(subjects)) {
+        return res.status(400).json({ message: "Exam name, total days, and subjects are required" });
       }
       
       const response = await generateStudyPlan(timeLeft, 8, subjects, "", new Date());
