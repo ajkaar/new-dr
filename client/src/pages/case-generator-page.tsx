@@ -13,7 +13,20 @@ import { generateCase } from '@/lib/ai-service';
 import { useToast } from '@/hooks/use-toast';
 
 export default function CaseGeneratorPage() {
+  const { user, isLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Redirect to="/auth" />;
+  }
   const [userAnswer, setUserAnswer] = useState('');
   const [showAnswer, setShowAnswer] = useState(false);
   const [specialty, setSpecialty] = useState('medicine');
