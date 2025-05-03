@@ -610,14 +610,14 @@ const MemoryBoosterPage: React.FC = () => {
                 />
               </div>
               <Select
-                value={selectedCategory || ""}
-                onValueChange={(value) => setSelectedCategory(value || null)}
+                value={selectedCategory || "all"}
+                onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   <SelectItem value="anatomy">Anatomy</SelectItem>
                   <SelectItem value="biochemistry">Biochemistry</SelectItem>
                   <SelectItem value="pharmacology">Pharmacology</SelectItem>
