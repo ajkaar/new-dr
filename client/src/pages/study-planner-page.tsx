@@ -1,25 +1,17 @@
-import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { Loader2 } from "lucide-react";
-import { Redirect } from "wouter";
-import AppLayout from "@/components/layouts/app-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { format } from "date-fns";
-import { useToast } from "@/hooks/use-toast";
-
+import React, { useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { Loader2 } from 'lucide-react';
+import { Redirect } from 'wouter';
+import AppLayout from '@/components/layouts/app-layout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
 
 const MEDICAL_SUBJECTS = [
   "Medicine",
@@ -42,22 +34,9 @@ export default function StudyPlannerPage() {
   const [hoursPerDay, setHoursPerDay] = useState("6");
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [weakTopics, setWeakTopics] = useState("");
-  const [progress, setProgress] = useState(35); // Example progress
-  const [weeklyPlan, setWeeklyPlan] = useState([]);
-  const [currentView, setCurrentView] = useState('weekly'); // weekly or monthly
-  
-  interface DetailedTask {
-    date: string;
-    task: string;
-    hours: number;
-    done: false;
-    subtopics: string[];
-    resources: string[];
-    milestones: string[];
-  }
-  const [isGenerating, setIsGenerating] = useState(false); // Added state for loading
-  const [studyPlan, setStudyPlan] = useState(null); // Added state to store the generated plan
-
+  const [progress, setProgress] = useState(35);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [studyPlan, setStudyPlan] = useState<any>(null);
 
   if (isLoading) {
     return (
@@ -74,55 +53,41 @@ export default function StudyPlannerPage() {
   const handleGeneratePlan = async () => {
     setIsGenerating(true);
     try {
-      try {
-        const response = await fetch('/api/study-plan', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            examName: "NEET PG",
-            totalDays: parseInt(totalDays),
-            hoursPerDay: parseInt(hoursPerDay),
-            subjects: selectedSubjects,
-            weakTopics,
-            startDate: date.toISOString()
-          }),
-        });
+      const response = await fetch('/api/study-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          examName: "NEET PG",
+          totalDays: parseInt(totalDays),
+          hoursPerDay: parseInt(hoursPerDay),
+          subjects: selectedSubjects,
+          weakTopics,
+          startDate: date.toISOString()
+        }),
+      });
 
-        if (!response.ok) {
-          throw new Error('Failed to generate study plan');
-        }
-
-        const data = await response.json();
-        setStudyPlan(data.studyPlan);
-        setWeeklyPlan(data.studyPlan.plan.map((item: any) => ({
-          date: item.date,
-          task: item.task,
-          subtopics: item.subtopics || [],
-          resources: item.resources || [],
-          milestones: item.milestones || [],
-          hours: item.hours,
-          done: false
-        })));
-        toast({
-          title: "Success",
-          description: "Study plan generated successfully!"
-        });
+      if (!response.ok) {
+        throw new Error('Failed to generate study plan');
       }
+
+      const data = await response.json();
+      setStudyPlan(data.studyPlan);
+      toast({
+        title: "Success",
+        description: "Study plan generated successfully!"
+      });
     } catch (error) {
       console.error("Failed to generate plan:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate study plan. Please try again.",
+        variant: "destructive"
+      });
     } finally {
-      setIsGenerating(false); // Reset loading state
+      setIsGenerating(false);
     }
-  };
-
-  const toggleTaskDone = (index: number) => {
-    setWeeklyPlan(prev => 
-      prev.map((task, i) => 
-        i === index ? { ...task, done: !task.done } : task
-      )
-    );
   };
 
   return (
@@ -131,7 +96,6 @@ export default function StudyPlannerPage() {
       description="Create and track your personalized study plan"
     >
       <div className="max-w-7xl mx-auto p-4 space-y-6">
-        {/* Input Form */}
         <Card>
           <CardHeader>
             <CardTitle>Create Your Study Plan</CardTitle>
@@ -169,7 +133,7 @@ export default function StudyPlannerPage() {
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={(date) => date && setDate(date)}
+                  onSelect={(newDate) => newDate && setDate(newDate)}
                   className="rounded-md border"
                 />
               </div>
@@ -198,181 +162,45 @@ export default function StudyPlannerPage() {
               </div>
             </div>
             <div className="md:col-span-2">
-              <Button onClick={handleGeneratePlan} className="w-full">
-                Generate My Plan
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Weekly Plan */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Weekly Study Plan</CardTitle>
-            <div className="space-x-2">
               <Button 
-                variant="outline" 
-                onClick={handleGeneratePlan}
-                disabled={isGenerating}
+                onClick={handleGeneratePlan} 
+                disabled={isGenerating || selectedSubjects.length === 0}
+                className="w-full"
               >
                 {isGenerating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Regenerating...
+                    Generating Plan...
                   </>
                 ) : (
-                  "Re-Generate Plan"
+                  "Generate My Plan"
                 )}
               </Button>
-              <Button 
-                variant="outline"
-                onClick={() => {
-                  if (studyPlan) {
-                    toast({
-                      title: "Progress",
-                      description: `Current progress: ${progress}% completed`
-                    });
-                  }
-                }}
-              >
-                View Progress
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="flex-1">
-                  <Label>Overall Progress</Label>
-                  <Progress value={progress} className="mt-2" />
-                </div>
-                <div className="text-2xl font-bold">{progress}%</div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="space-x-2">
-                    <Button 
-                      variant={currentView === 'weekly' ? 'default' : 'outline'}
-                      onClick={() => setCurrentView('weekly')}
-                    >
-                      Weekly View
-                    </Button>
-                    <Button
-                      variant={currentView === 'monthly' ? 'default' : 'outline'} 
-                      onClick={() => setCurrentView('monthly')}
-                    >
-                      Monthly View
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="border rounded-lg">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="p-3 text-left">Date</th>
-                        <th className="p-3 text-left">Task</th>
-                        <th className="p-3 text-left">Subtopics</th>
-                        <th className="p-3 text-left">Resources</th>
-                        <th className="p-3 text-left">Hours</th>
-                        <th className="p-3 text-left">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {weeklyPlan.map((item: DetailedTask, index) => (
-                        <tr key={index} className="border-b last:border-0">
-                          <td className="p-3">{item.date}</td>
-                          <td className="p-3">
-                            <div>
-                              <div className="font-medium">{item.task}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {item.milestones?.join(', ')}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="p-3">
-                            <ul className="list-disc list-inside text-sm">
-                              {item.subtopics?.map((topic, i) => (
-                                <li key={i}>{topic}</li>
-                              )) || 'No subtopics available'}
-                            </ul>
-                          </td>
-                          <td className="p-3">
-                            <ul className="list-disc list-inside text-sm">
-                              {item.resources?.map((resource, i) => (
-                                <li key={i}>{resource}</li>
-                              )) || 'No resources available'}
-                            </ul>
-                          </td>
-                          <td className="p-3">{item.hours} hrs</td>
-                          <td className="p-3">
-                            <Checkbox
-                              checked={item.done}
-                              onCheckedChange={() => toggleTaskDone(index)}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
             </div>
           </CardContent>
         </Card>
+
+        {studyPlan && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Study Plan</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {studyPlan.plan.map((day: any, index: number) => (
+                  <div key={index} className="p-4 border rounded">
+                    <h3 className="font-medium">{day.date}</h3>
+                    <p>{day.task}</p>
+                    <div className="text-sm text-gray-500">
+                      Duration: {day.hours} hours
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </AppLayout>
   );
 }
-
-const createStudyPlan = async (
-  examName: string, 
-  totalDays: number, 
-  hoursPerDay: number,
-  subjects: string[],
-  weakTopics: string,
-  startDate: Date
-) => {
-  try {
-    const response = await fetch('/api/study-plan', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        examName,
-        totalDays,
-        hoursPerDay,
-        subjects,
-        weakTopics,
-        startDate: startDate.toISOString()
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to generate study plan');
-    }
-
-    const data = await response.json();
-    return {
-      studyPlan: {
-        examName,
-        totalDays,
-        subjects,
-        plan: data.plan.dailyTasks.map((task: any) => ({
-          date: format(new Date(task.date), 'MMM d'),
-          task: task.subject,
-          subtopics: task.subtopics,
-          resources: task.resources,
-          milestones: task.milestones,
-          hours: task.hours,
-          done: false
-        }))
-      }
-    };
-  } catch (error) {
-    console.error('Failed to generate plan:', error);
-    throw error;
-  }
-};
