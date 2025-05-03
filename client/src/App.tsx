@@ -16,6 +16,10 @@ import NeetPgPage from "@/pages/neet-pg-page";
 import MemoryBoosterPage from "@/pages/memory-booster-page";
 import VoiceAssistantPage from "@/pages/voice-assistant-page";
 import CaseGeneratorPage from "@/pages/case-generator-page";
+import DrugAssistantPage from "@/pages/drug-assistant-page";
+import NotesMakerPage from "@/pages/notes-maker-page";
+import StudyPlannerPage from "@/pages/study-planner-page";
+import MedFeedPage from "@/pages/med-feed-page";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -41,6 +45,10 @@ function Router() {
       <Route path="/memory-booster" component={MemoryBoosterPage} />
       <Route path="/voice-assistant" component={VoiceAssistantPage} />
       <Route path="/case-generator" component={CaseGeneratorPage} />
+      <Route path="/drug-assistant" component={DrugAssistantPage} />
+      <Route path="/notes-maker" component={NotesMakerPage} />
+      <Route path="/study-planner" component={StudyPlannerPage} />
+      <Route path="/med-feed" component={MedFeedPage} />
       <Route component={NotFound} />
     </Switch>
   );
