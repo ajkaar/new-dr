@@ -25,10 +25,18 @@ export default function CaseGeneratorPage() {
     setIsGenerating(true);
     try {
       const response = await generateCase(specialty);
-      setCaseData(response.case);
-      setCurrentStep(0);
-      setShowAnswer(false);
-      setUserAnswer('');
+      if (response.case) {
+        setCaseData(response.case);
+        setCurrentStep(0);
+        setShowAnswer(false);
+        setUserAnswer('');
+      } else {
+        toast({
+          title: "Error",
+          description: "Please log in to generate cases",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",
