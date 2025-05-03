@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
@@ -19,6 +18,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
+import { toast } from "@/components/ui/use-toast";
+
 
 const MEDICAL_SUBJECTS = [
   "Medicine",
@@ -61,6 +62,9 @@ export default function StudyPlannerPage() {
       done: false,
     },
   ]);
+  const [isGenerating, setIsGenerating] = useState(false); // Added state for loading
+  const [studyPlan, setStudyPlan] = useState(null); // Added state to store the generated plan
+
 
   if (isLoading) {
     return (
@@ -75,19 +79,23 @@ export default function StudyPlannerPage() {
   }
 
   const handleGeneratePlan = async () => {
+    setIsGenerating(true); // Set loading state
     try {
       const response = await createStudyPlan(
         "NEET PG",
         parseInt(totalDays),
         selectedSubjects
       );
-      
+
       if (response.studyPlan) {
+        setStudyPlan(response.studyPlan); // Store the generated plan
         console.log("Plan generated:", response.studyPlan);
         // Add any state updates or UI feedback here
       }
     } catch (error) {
       console.error("Failed to generate plan:", error);
+    } finally {
+      setIsGenerating(false); // Reset loading state
     }
   };
 
@@ -184,10 +192,33 @@ export default function StudyPlannerPage() {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Weekly Study Plan</CardTitle>
             <div className="space-x-2">
-              <Button variant="outline" onClick={handleGeneratePlan}>
-                Re-Generate Plan
+              <Button 
+                variant="outline" 
+                onClick={handleGeneratePlan}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Regenerating...
+                  </>
+                ) : (
+                  "Re-Generate Plan"
+                )}
               </Button>
-              <Button variant="outline">View Progress</Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  if (studyPlan) {
+                    toast({
+                      title: "Progress",
+                      description: `Current progress: ${progress}% completed`
+                    });
+                  }
+                }}
+              >
+                View Progress
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
@@ -199,7 +230,7 @@ export default function StudyPlannerPage() {
                 </div>
                 <div className="text-2xl font-bold">{progress}%</div>
               </div>
-              
+
               <div className="border rounded-lg">
                 <table className="w-full">
                   <thead>
@@ -234,3 +265,20 @@ export default function StudyPlannerPage() {
     </AppLayout>
   );
 }
+
+// Dummy function - Replace with your actual implementation
+const createStudyPlan = async (examName: string, totalDays: number, subjects: string[]) => {
+  // Simulate an API call
+  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate a delay
+  return {
+    studyPlan: {
+      examName,
+      totalDays,
+      subjects,
+      plan: [
+        {date: "May 8", task: "Subject A", hours: 4},
+        {date: "May 9", task: "Subject B", hours: 3}
+      ]
+    }
+  };
+};
