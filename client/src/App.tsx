@@ -33,6 +33,12 @@ function Router() {
 }
 
 function App() {
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

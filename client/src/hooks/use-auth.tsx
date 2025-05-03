@@ -39,6 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } = useQuery<SelectUser | undefined, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
+    //  The following line needs to be modified to include authentication headers (e.g., JWT)
+    //  to avoid 401 Unauthorized errors.  See comment below for more detail.
   });
 
   const loginMutation = useMutation({
