@@ -75,8 +75,20 @@ export default function StudyPlannerPage() {
   }
 
   const handleGeneratePlan = async () => {
-    // TODO: Implement plan generation logic
-    console.log("Generating plan...");
+    try {
+      const response = await createStudyPlan(
+        "NEET PG",
+        parseInt(totalDays),
+        selectedSubjects
+      );
+      
+      if (response.studyPlan) {
+        console.log("Plan generated:", response.studyPlan);
+        // Add any state updates or UI feedback here
+      }
+    } catch (error) {
+      console.error("Failed to generate plan:", error);
+    }
   };
 
   const toggleTaskDone = (index: number) => {
