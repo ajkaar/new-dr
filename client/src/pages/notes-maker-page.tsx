@@ -248,7 +248,7 @@ export default function NotesMakerPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: generatedNotes }} />
+              <div className="prose prose-slate max-w-none dark:prose-invert prose-headings:text-primary prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-base prose-p:leading-7 prose-a:text-primary prose-strong:text-primary/90 prose-ul:list-disc prose-ol:list-decimal prose-li:my-1 prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300" dangerouslySetInnerHTML={{ __html: generatedNotes }} />
               
               {relatedTopics.length > 0 && (
                 <div className="mt-4">
@@ -316,7 +316,7 @@ export default function NotesMakerPage() {
                           </Button>
                         </div>
                       </div>
-                      <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: note.content }} />
+                      <div className="prose prose-slate max-w-none dark:prose-invert prose-headings:text-primary prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-base prose-p:leading-7 prose-a:text-primary prose-strong:text-primary/90 prose-ul:list-disc prose-ol:list-decimal prose-li:my-1 prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300" dangerouslySetInnerHTML={{ __html: note.content }} />
                     </CardContent>
                   </Card>
                 ))}
