@@ -313,19 +313,53 @@ export default function StudyPlannerPage() {
   );
 }
 
-// Dummy function - Replace with your actual implementation
-const createStudyPlan = async (examName: string, totalDays: number, subjects: string[]) => {
-  // Simulate an API call
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate a delay
-  return {
-    studyPlan: {
-      examName,
-      totalDays,
-      subjects,
-      plan: [
-        {date: "May 8", task: "Subject A", hours: 4},
-        {date: "May 9", task: "Subject B", hours: 3}
-      ]
+const createStudyPlan = async (
+  examName: string, 
+  totalDays: number, 
+  hoursPerDay: number,
+  subjects: string[],
+  weakTopics: string,
+  startDate: Date
+) => {
+  try {
+    const response = await fetch('/api/study-plan', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        examName,
+        totalDays,
+        hoursPerDay,
+        subjects,
+        weakTopics,
+        startDate: startDate.toISOString()
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate study plan');
     }
-  };
+
+    const data = await response.json();
+    return {
+      studyPlan: {
+        examName,
+        totalDays,
+        subjects,
+        plan: data.plan.dailyTasks.map((task: any) => ({
+          date: format(new Date(task.date), 'MMM d'),
+          task: task.subject,
+          subtopics: task.subtopics,
+          resources: task.resources,
+          milestones: task.milestones,
+          hours: task.hours,
+          done: false
+        }))
+      }
+    };
+  } catch (error) {
+    console.error('Failed to generate plan:', error);
+    throw error;
+  }
 };
