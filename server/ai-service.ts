@@ -45,13 +45,13 @@ export async function generateDiagnosis(symptoms: string): Promise<ChatResponse>
   const prompt = `
     I need a detailed differential diagnosis based on the following symptoms:
     ${symptoms}
-    
+
     Please provide:
     1. Top 3-5 potential diagnoses in order of likelihood
     2. Key clinical findings for each diagnosis
     3. Recommended diagnostic tests
     4. Initial management recommendations
-    
+
     Reference standard medical textbooks like Harrison's Internal Medicine in your analysis.
   `;
 
@@ -65,13 +65,13 @@ export async function generateQuiz(subject: string, topic: string, difficulty: s
     - Topic: ${topic}
     - Difficulty level: ${difficulty}
     - Number of questions: ${numQuestions}
-    
+
     For each question:
     1. Provide a clear, concise question
     2. Provide 4 possible answers labeled A-D with only one correct answer
     3. Indicate the correct answer
     4. Include a brief explanation for the correct answer referencing standard medical textbooks
-    
+
     Format the response as a structured JSON with a questions array containing objects with question, options, correctAnswer, and explanation properties.
   `;
 
@@ -100,7 +100,7 @@ export async function generateMnemonic(topic: string): Promise<ChatResponse> {
   const prompt = `
     Create a memorable mnemonic to help medical students remember the key points about:
     ${topic}
-    
+
     Include:
     1. The mnemonic itself (acronym or word-based)
     2. What each letter/word stands for
@@ -116,7 +116,7 @@ export async function generateCaseStudy(speciality: string, difficulty: string):
     Generate a realistic clinical case study for medical students aligned to the Indian MBBS curriculum:
     - Specialty: ${speciality}
     - Difficulty: ${difficulty}
-    
+
     Structure as:
     1. Patient demographics and chief complaint
     2. History of present illness
@@ -125,7 +125,7 @@ export async function generateCaseStudy(speciality: string, difficulty: string):
     5. Initial diagnostic results (labs, imaging, etc.)
     6. Questions for students to consider (diagnosis, management)
     7. Final diagnosis and discussion points
-    
+
     Make it clinically accurate, realistic, and educational.
     Format the response as a structured JSON object.
   `;
@@ -154,7 +154,7 @@ export async function generateCaseStudy(speciality: string, difficulty: string):
 export async function getDrugInformation(drugName: string): Promise<ChatResponse> {
   const prompt = `
     Provide comprehensive information about the drug: ${drugName}
-    
+
     Include:
     1. Drug class and mechanism of action
     2. FDA-approved indications 
@@ -164,40 +164,41 @@ export async function getDrugInformation(drugName: string): Promise<ChatResponse
     6. Key drug interactions to be aware of
     7. Contraindications
     8. Special considerations (pregnancy, renal/hepatic dosing)
-    
+
     Present this information in a structured, educational format suitable for medical students.
   `;
 
   return getAiChatResponse(prompt);
 }
 
-export async function createStudyPlan(
-  examGoal: string, 
-  timeLeftDays: number, 
-  subjects: string[]
+export async function generateStudyPlan(
+  totalDays: number,
+  hoursPerDay: number,
+  subjects: string[],
+  weakTopics: string,
+  startDate: Date
 ): Promise<ChatResponse> {
-  const prompt = `
-    Create a comprehensive study plan for a medical student with the following parameters:
-    - Target exam: ${examGoal}
-    - Time remaining: ${timeLeftDays} days
-    - Key subjects to cover: ${subjects.join(", ")}
-    
-    The study plan should include:
-    1. Weekly schedule with specific subjects/topics for each day
-    2. Approximate hours per day for efficient study
-    3. Recommended resources for each subject
-    4. Strategic approach to high-yield topics
-    5. Suggested practice tests and timing
-    6. Rest and revision days
-    
-    Optimize the plan for the Indian medical education system and the specific exam requirements.
-    Format the response as a structured JSON that can be easily parsed into a daily/weekly schedule.
-  `;
+  const systemPrompt = `You are an expert medical education planner specializing in creating personalized study plans for medical students preparing for NEET PG and similar exams. Create comprehensive study plans that are practical and trackable.`;
+
+  const userPrompt = `Create a detailed weekly study plan with the following parameters:
+  - Total preparation time: ${totalDays} days
+  - Daily study hours: ${hoursPerDay} hours
+  - Starting date: ${startDate.toISOString().split('T')[0]}
+  - Subjects to cover: ${subjects.join(", ")}
+  - Weak topics to focus on: ${weakTopics}
+
+  For each day, provide:
+  1. Subject and topic to study
+  2. Time allocation in hours
+  3. Specific tasks (reading, quiz, flashcards)
+  4. Resources to use
+
+  Format the response as a JSON array of daily tasks with dates, subjects, topics, and time allocations.`;
 
   try {
     const response = await openai.chat.completions.create({
       model: MODEL,
-      messages: [{ role: "user", content: prompt }],
+      messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
       response_format: { type: "json_object" },
     });
 
@@ -210,15 +211,15 @@ export async function createStudyPlan(
       }
     };
   } catch (error) {
-    console.error("Error in createStudyPlan:", error);
-    throw new Error("Failed to create study plan: " + (error as Error).message);
+    console.error("Error in generateStudyPlan:", error);
+    throw new Error("Failed to generate study plan: " + (error as Error).message);
   }
 }
 
 export async function generateNotes(topic: string): Promise<ChatResponse> {
   const prompt = `
     Create comprehensive yet concise study notes on the medical topic: ${topic}
-    
+
     Structure the notes with:
     1. Brief overview/definition
     2. Key concepts and principles
@@ -227,7 +228,7 @@ export async function generateNotes(topic: string): Promise<ChatResponse> {
     5. Mnemonics or memory aids
     6. High-yield facts for exams
     7. Simple diagrams that could be drawn (describe them textually)
-    
+
     Make these notes ready for medical students to study from, with emphasis on clarity and memorability.
     Focus on information that would appear in standard medical textbooks.
   `;
