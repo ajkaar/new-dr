@@ -43,26 +43,18 @@ export default function StudyPlannerPage() {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [weakTopics, setWeakTopics] = useState("");
   const [progress, setProgress] = useState(35); // Example progress
-  const [weeklyPlan, setWeeklyPlan] = useState([
-    {
-      date: "May 5",
-      task: "Medicine: Cardiovascular",
-      hours: 2,
-      done: false,
-    },
-    {
-      date: "May 6",
-      task: "Pharmacology: Antimicrobials + Quiz",
-      hours: 3,
-      done: false,
-    },
-    {
-      date: "May 7",
-      task: "Pathology: Neoplasia + Flashcards",
-      hours: 2,
-      done: false,
-    },
-  ]);
+  const [weeklyPlan, setWeeklyPlan] = useState([]);
+  const [currentView, setCurrentView] = useState('weekly'); // weekly or monthly
+  
+  interface DetailedTask {
+    date: string;
+    task: string;
+    hours: number;
+    done: false;
+    subtopics: string[];
+    resources: string[];
+    milestones: string[];
+  }
   const [isGenerating, setIsGenerating] = useState(false); // Added state for loading
   const [studyPlan, setStudyPlan] = useState(null); // Added state to store the generated plan
 
@@ -80,12 +72,15 @@ export default function StudyPlannerPage() {
   }
 
   const handleGeneratePlan = async () => {
-    setIsGenerating(true); // Set loading state
+    setIsGenerating(true);
     try {
       const response = await createStudyPlan(
         "NEET PG",
         parseInt(totalDays),
-        selectedSubjects
+        parseInt(hoursPerDay),
+        selectedSubjects,
+        weakTopics,
+        date
       );
 
       if (response.studyPlan) {
@@ -241,32 +236,74 @@ export default function StudyPlannerPage() {
                 <div className="text-2xl font-bold">{progress}%</div>
               </div>
 
-              <div className="border rounded-lg">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="p-3 text-left">Date</th>
-                      <th className="p-3 text-left">Task</th>
-                      <th className="p-3 text-left">Hours</th>
-                      <th className="p-3 text-left">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {weeklyPlan.map((item, index) => (
-                      <tr key={index} className="border-b last:border-0">
-                        <td className="p-3">{item.date}</td>
-                        <td className="p-3">{item.task}</td>
-                        <td className="p-3">{item.hours} hrs</td>
-                        <td className="p-3">
-                          <Checkbox
-                            checked={item.done}
-                            onCheckedChange={() => toggleTaskDone(index)}
-                          />
-                        </td>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <div className="space-x-2">
+                    <Button 
+                      variant={currentView === 'weekly' ? 'default' : 'outline'}
+                      onClick={() => setCurrentView('weekly')}
+                    >
+                      Weekly View
+                    </Button>
+                    <Button
+                      variant={currentView === 'monthly' ? 'default' : 'outline'} 
+                      onClick={() => setCurrentView('monthly')}
+                    >
+                      Monthly View
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="border rounded-lg">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="p-3 text-left">Date</th>
+                        <th className="p-3 text-left">Task</th>
+                        <th className="p-3 text-left">Subtopics</th>
+                        <th className="p-3 text-left">Resources</th>
+                        <th className="p-3 text-left">Hours</th>
+                        <th className="p-3 text-left">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {weeklyPlan.map((item: DetailedTask, index) => (
+                        <tr key={index} className="border-b last:border-0">
+                          <td className="p-3">{item.date}</td>
+                          <td className="p-3">
+                            <div>
+                              <div className="font-medium">{item.task}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {item.milestones.join(', ')}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <ul className="list-disc list-inside text-sm">
+                              {item.subtopics.map((topic, i) => (
+                                <li key={i}>{topic}</li>
+                              ))}
+                            </ul>
+                          </td>
+                          <td className="p-3">
+                            <ul className="list-disc list-inside text-sm">
+                              {item.resources.map((resource, i) => (
+                                <li key={i}>{resource}</li>
+                              ))}
+                            </ul>
+                          </td>
+                          <td className="p-3">{item.hours} hrs</td>
+                          <td className="p-3">
+                            <Checkbox
+                              checked={item.done}
+                              onCheckedChange={() => toggleTaskDone(index)}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </CardContent>
