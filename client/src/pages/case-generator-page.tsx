@@ -17,7 +17,6 @@ export default function CaseGeneratorPage() {
   const [userAnswer, setUserAnswer] = useState('');
   const [showAnswer, setShowAnswer] = useState(false);
   const [specialty, setSpecialty] = useState('medicine');
-  const [difficulty, setDifficulty] = useState('moderate');
   const [caseData, setCaseData] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -25,7 +24,7 @@ export default function CaseGeneratorPage() {
   const handleGenerateCase = async () => {
     setIsGenerating(true);
     try {
-      const response = await generateCase(specialty, difficulty);
+      const response = await generateCase(specialty);
       setCaseData(response.case);
       setCurrentStep(0);
       setShowAnswer(false);
@@ -61,24 +60,21 @@ export default function CaseGeneratorPage() {
                   <SelectValue placeholder="Select specialty" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="medicine">Medicine</SelectItem>
-                  <SelectItem value="surgery">Surgery</SelectItem>
+                  <SelectItem value="internal-medicine">Internal Medicine</SelectItem>
+                  <SelectItem value="cardiology">Cardiology</SelectItem>
+                  <SelectItem value="pulmonology">Pulmonology</SelectItem>
+                  <SelectItem value="gastroenterology">Gastroenterology</SelectItem>
+                  <SelectItem value="neurology">Neurology</SelectItem>
+                  <SelectItem value="nephrology">Nephrology</SelectItem>
+                  <SelectItem value="endocrinology">Endocrinology</SelectItem>
+                  <SelectItem value="general-surgery">General Surgery</SelectItem>
+                  <SelectItem value="orthopedics">Orthopedics</SelectItem>
                   <SelectItem value="pediatrics">Pediatrics</SelectItem>
-                  <SelectItem value="obgyn">Obstetrics & Gynecology</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Difficulty</Label>
-              <Select value={difficulty} onValueChange={setDifficulty}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select difficulty" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="easy">Easy (UG Level)</SelectItem>
-                  <SelectItem value="moderate">Moderate</SelectItem>
-                  <SelectItem value="difficult">Difficult (PG Level)</SelectItem>
+                  <SelectItem value="obstetrics-gynecology">Obstetrics & Gynecology</SelectItem>
+                  <SelectItem value="psychiatry">Psychiatry</SelectItem>
+                  <SelectItem value="dermatology">Dermatology</SelectItem>
+                  <SelectItem value="ophthalmology">Ophthalmology</SelectItem>
+                  <SelectItem value="ent">ENT</SelectItem>
                 </SelectContent>
               </Select>
             </div>
