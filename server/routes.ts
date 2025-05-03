@@ -72,6 +72,47 @@ router.delete('/api/notes/:id', authenticate, async (req, res) => {
   }
 });
 
+// News routes
+router.get('/api/news', authenticate, async (req, res) => {
+  try {
+    const { category, sort } = req.query;
+    const news = await db.query.newsItems.findMany({
+      where: category ? { category: category as string } : undefined,
+      orderBy: sort === 'popular' ? { views: 'desc' } : { publishedAt: 'desc' }
+    });
+    res.json(news);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch news" });
+  }
+});
+
+router.post('/api/news/bookmark', authenticate, async (req, res) => {
+  try {
+    const { newsId } = req.body;
+    await db.insert(bookmarkedNews).values({
+      userId: req.user.id,
+      newsId,
+      createdAt: new Date()
+    });
+    res.json({ message: "News bookmarked successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to bookmark news" });
+  }
+});
+
+router.get('/api/news/bookmarked', authenticate, async (req, res) => {
+  try {
+    const bookmarks = await db.query.bookmarkedNews.findMany({
+      where: { userId: req.user.id },
+      include: { news: true }
+    });
+    res.json(bookmarks);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch bookmarked news" });
+  }
+});
+
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes (/api/register, /api/login, /api/logout, /api/user)
   setupAuth(app);
