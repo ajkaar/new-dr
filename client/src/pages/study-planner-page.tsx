@@ -36,6 +36,7 @@ const MEDICAL_SUBJECTS = [
 
 export default function StudyPlannerPage() {
   const { user, isLoading } = useAuth();
+  const { toast } = useToast();
   const [date, setDate] = useState<Date>(new Date());
   const [totalDays, setTotalDays] = useState("90");
   const [hoursPerDay, setHoursPerDay] = useState("6");
@@ -88,9 +89,18 @@ export default function StudyPlannerPage() {
       );
 
       if (response.studyPlan) {
-        setStudyPlan(response.studyPlan); // Store the generated plan
-        console.log("Plan generated:", response.studyPlan);
-        // Add any state updates or UI feedback here
+        setStudyPlan(response.studyPlan);
+        // Update weekly plan with the new plan
+        setWeeklyPlan(response.studyPlan.plan.map(item => ({
+          date: item.date,
+          task: item.task,
+          hours: item.hours,
+          done: false
+        })));
+        toast({
+          title: "Success",
+          description: "Study plan generated successfully!"
+        });
       }
     } catch (error) {
       console.error("Failed to generate plan:", error);
@@ -210,8 +220,7 @@ export default function StudyPlannerPage() {
                 variant="outline"
                 onClick={() => {
                   if (studyPlan) {
-                    const { toast } = useToast();
-  toast({
+                    toast({
                       title: "Progress",
                       description: `Current progress: ${progress}% completed`
                     });
