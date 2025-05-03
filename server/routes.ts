@@ -9,7 +9,7 @@ import {
   generateMnemonic,
   generateCaseStudy,
   getDrugInformation,
-  createStudyPlan,
+  generateStudyPlan,
   generateNotes
 } from "./ai-service";
 
@@ -286,7 +286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Goal exam, timeLeft, and subjects are required" });
       }
       
-      const response = await createStudyPlan(goalExam, timeLeft, subjects);
+      const response = await generateStudyPlan(timeLeft, 8, subjects, "", new Date());
       
       // Update user token usage
       const user = req.user as Express.User;
