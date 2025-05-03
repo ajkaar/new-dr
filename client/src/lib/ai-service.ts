@@ -1,11 +1,11 @@
 
-export async function generateCase(specialty: string) {
+export async function generateCase(specialty: string, difficulty: string) {
   const response = await fetch('/api/case/generate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ specialty }),
+    body: JSON.stringify({ specialty, difficulty }),
   });
 
   if (!response.ok) {

@@ -40,7 +40,7 @@ export default function CaseGeneratorPage() {
   const handleGenerateCase = async () => {
     setIsGenerating(true);
     try {
-      const response = await generateCase(specialty);
+      const response = await generateCase(specialty, difficulty);
       if (response.case) {
         setCaseData(response.case);
         setCurrentStep(0);
