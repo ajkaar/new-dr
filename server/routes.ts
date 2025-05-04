@@ -783,6 +783,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Token Management
+  app.post("/api/admin/users/:userId/tokens", authenticate, async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated() || req.user.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+
+      const { tokenLimit } = req.body;
+      const { userId } = req.params;
+
+      const user = await storage.getUser(parseInt(userId));
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const updatedUser = await storage.updateUser(parseInt(userId), {
+        ...user,
+        tokenLimit: parseInt(tokenLimit)
+      });
+
+      res.json(updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Admin Subscription Management
+  app.post("/api/admin/users/:userId/subscription", authenticate, async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated() || req.user.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+
+      const { subscriptionStatus } = req.body;
+      const { userId } = req.params;
+
+      const user = await storage.getUser(parseInt(userId));
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const updatedUser = await storage.updateUser(parseInt(userId), {
+        ...user,
+        subscriptionStatus
+      });
+
+      res.json(updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Admin Get Users
+  app.get("/api/admin/users", authenticate, async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated() || req.user.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

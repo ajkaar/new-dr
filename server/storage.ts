@@ -146,6 +146,23 @@ export class MemStorage implements IStorage {
     return updatedUser;
   }
 
+  async updateUser(userId: number, userData: Partial<User>): Promise<User | undefined> {
+    const user = await this.getUser(userId);
+    if (!user) return undefined;
+    
+    const updatedUser: User = {
+      ...user,
+      ...userData
+    };
+    
+    this.users.set(userId, updatedUser);
+    return updatedUser;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
   // Quiz methods
   async createQuizAttempt(insertQuizAttempt: InsertQuizAttempt): Promise<QuizAttempt> {
     const id = this.quizAttemptCurrentId++;
