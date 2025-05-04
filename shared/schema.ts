@@ -15,6 +15,16 @@ export const users = pgTable("users", {
   subscriptionStatus: text("subscription_status").notNull().default("free_trial"),
   tokenUsage: integer("token_usage").notNull().default(0),
   tokenLimit: integer("token_limit").notNull().default(20000),
+  // Profile fields
+  dateOfBirth: timestamp("date_of_birth"),
+  college: text("college"),
+  yearOfStudy: integer("year_of_study"),
+  specialization: text("specialization"),
+  state: text("state"),
+  city: text("city"),
+  bio: text("bio"),
+  profilePicture: text("profile_picture"),
+  lastUpdated: timestamp("last_updated").defaultNow(),
 });
 
 // Quiz attempts

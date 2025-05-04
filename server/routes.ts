@@ -690,6 +690,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update User Profile
+  app.post("/api/profile/update", authenticate, async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const user = req.user as Express.User;
+      const updatedUser = await storage.updateUser(user.id, {
+        ...req.body,
+        lastUpdated: new Date()
+      });
+
+      res.json(updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // Get Study Time This Week
   app.get("/api/study-time", authenticate, async (req, res, next) => {
     try {
