@@ -33,7 +33,19 @@ export default function CaseGeneratorPage() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [specialty, setSpecialty] = useState('medicine');
   const [difficulty, setDifficulty] = useState('moderate');
-  const [caseData, setCaseData] = useState<any>(null);
+  interface CaseStep {
+  content: string;
+  question: string;
+  expectedAnswer: string;
+  clinicalPearls: string[];
+}
+
+interface CaseData {
+  title: string;
+  steps: CaseStep[];
+}
+
+const [caseData, setCaseData] = useState<CaseData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -160,40 +172,48 @@ export default function CaseGeneratorPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <h3 className="font-medium mb-2">Clinical Information:</h3>
-                      <p>{caseData.steps[currentStep].content}</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="font-medium">Question:</h3>
-                      <p>{caseData.steps[currentStep].question}</p>
-                      <Textarea
-                        value={userAnswer}
-                        onChange={(e) => setUserAnswer(e.target.value)}
-                        placeholder="Type your answer here..."
-                        className="mt-2"
-                      />
-                    </div>
-
-                    {showAnswer && (
-                      <div className="space-y-4">
-                        <Alert>
-                          <BookOpen className="h-4 w-4" />
-                          <AlertTitle>Expected Answer</AlertTitle>
-                          <AlertDescription>
-                            {caseData.steps[currentStep].expectedAnswer}
-                          </AlertDescription>
-                        </Alert>
-
-                        <div className="bg-primary/5 p-4 rounded-lg">
-                          <h4 className="font-medium mb-2">Clinical Pearls:</h4>
-                          <ul className="list-disc list-inside space-y-1">
-                            {caseData.steps[currentStep].clinicalPearls.map((pearl: string, index: number) => (
-                              <li key={index} className="text-sm">{pearl}</li>
-                            ))}
-                          </ul>
+                    {caseData?.steps && caseData.steps[currentStep] ? (
+                      <>
+                        <div className="bg-muted/30 p-4 rounded-lg">
+                          <h3 className="font-medium mb-2">Clinical Information:</h3>
+                          <p>{caseData.steps[currentStep].content}</p>
                         </div>
+
+                        <div className="space-y-2">
+                          <h3 className="font-medium">Question:</h3>
+                          <p>{caseData.steps[currentStep].question}</p>
+                          <Textarea
+                            value={userAnswer}
+                            onChange={(e) => setUserAnswer(e.target.value)}
+                            placeholder="Type your answer here..."
+                            className="mt-2"
+                          />
+                        </div>
+
+                        {showAnswer && (
+                          <div className="space-y-4">
+                            <Alert>
+                              <BookOpen className="h-4 w-4" />
+                              <AlertTitle>Expected Answer</AlertTitle>
+                              <AlertDescription>
+                                {caseData.steps[currentStep].expectedAnswer}
+                              </AlertDescription>
+                            </Alert>
+
+                            <div className="bg-primary/5 p-4 rounded-lg">
+                              <h4 className="font-medium mb-2">Clinical Pearls:</h4>
+                              <ul className="list-disc list-inside space-y-1">
+                                {caseData.steps[currentStep].clinicalPearls?.map((pearl: string, index: number) => (
+                                  <li key={index} className="text-sm">{pearl}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <p>No case data available. Please generate a new case.</p>
                       </div>
                     )}
                   </div>
