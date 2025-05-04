@@ -741,6 +741,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Settings Management
+  app.get("/api/settings", authenticate, async (req, res) => {
+    try {
+      const user = req.user as Express.User;
+      const settings = await storage.getUserSettings(user.id);
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.post("/api/settings", authenticate, async (req, res) => {
+    try {
+      const user = req.user as Express.User;
+      const { theme, language, textSize, notifications, dataSharing } = req.body;
+      
+      const settings = await storage.updateUserSettings(user.id, {
+        theme,
+        language,
+        textSize,
+        notifications,
+        dataSharing,
+        lastUpdated: new Date()
+      });
+
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
+  app.post("/api/settings/notifications", authenticate, async (req, res) => {
+    try {
+      const user = req.user as Express.User;
+      const settings = await storage.updateUserNotifications(user.id, req.body);
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update notification settings" });
+    }
+  });
+
+  app.post("/api/user/delete", authenticate, async (req, res) => {
+    try {
+      const user = req.user as Express.User;
+      await storage.deleteUserAccount(user.id);
+      req.logout(() => {
+        res.json({ message: "Account deleted successfully" });
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete account" });
+    }
+  });
+
+  app.get("/api/user/data", authenticate, async (req, res) => {
+    try {
+      const user = req.user as Express.User;
+      const userData = await storage.getUserData(user.id);
+      res.json(userData);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user data" });
+    }
+  });
+
   app.get("/api/user/stats", authenticate, async (req, res) => {
     try {
       const user = req.user as Express.User;

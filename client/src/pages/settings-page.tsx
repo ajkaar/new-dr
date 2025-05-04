@@ -89,6 +89,64 @@ export default function SettingsPage() {
     }
   };
 
+  const [settings, setSettings] = useState({
+    theme: 'light',
+    language: 'english',
+    textSize: 'medium',
+    notifications: {
+      pushEnabled: true,
+      newCases: true,
+      newsUpdates: true,
+      studyReminders: true,
+      subscriptionAlerts: true
+    },
+    dataSharing: true
+  });
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const response = await fetch('/api/settings');
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(data);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load settings",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const updateSettings = async (newSettings: any) => {
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSettings)
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(data);
+        toast({
+          title: "Success",
+          description: "Settings updated successfully"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update settings",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDataDownload = async () => {
     try {
       // API call to download user data

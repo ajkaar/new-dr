@@ -3,6 +3,23 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // User model
+export const userSettings = pgTable("user_settings", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  theme: text("theme").notNull().default("light"),
+  language: text("language").notNull().default("english"),
+  textSize: text("text_size").notNull().default("medium"),
+  notifications: json("notifications").notNull().default({
+    pushEnabled: true,
+    newCases: true,
+    newsUpdates: true,
+    studyReminders: true,
+    subscriptionAlerts: true
+  }),
+  dataSharing: boolean("data_sharing").notNull().default(true),
+  lastUpdated: timestamp("last_updated").defaultNow()
+});
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
