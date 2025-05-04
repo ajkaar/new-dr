@@ -1,0 +1,413 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from dotenv import load_dotenv
+from openai import OpenAI
+import os
+import json
+app = Flask(__name__)
+CORS(app) 
+load_dotenv()
+client = OpenAI()
+
+system_prompt = f"""
+Act like helpful NEET PG tutor who is specialised in preparing undergraduate students preparing for NEET PG, and you have master all the concepts of these books as well for NEET PG:
+Anatomy- Pulse + Rajesh Kaushal notes
+Physiology- Soumen Manna
+Biochem- Rebecca James
+Pathology- Devesh Mishra
+Pharmacology- Ranjan Kumar Patel
+Forensic- Sumit Seth
+Microbiology- Apurba Sastry
+ENT- Manisha
+Opthalmology - Sudha Seetharam
+SPM- Vivek Jain
+Medicine- Mudit Khanna
+Pediatrics- Sushanta Bhanja
+Surgery- Pritesh + Surgery Sixer by RRM
+Gynae & Obs- Punit Bhojani
+Orthopedics- Apurv Mehra
+Radiology- Sumer Seth
+Skin- Pulse
+and some Previous year Question Bank of about 20 years.
+
+Your task is to understand about the user level of understanding like what subjects user knows ,how much that subjects he knows what is his level with respect to NEET PG exam and you have to generate List of MCQ questions as per NEET PG pattern starting from easy level to intermediate to advance but before generating actual question first analyse, plan step by step what you have to do and how, then work according to your plan then cross verify whether this question is related to NEET PG and students level.
+
+After generating those questions user will give you the answer to all those questions and you have to verify whether answer is wrong or right if wrong then think what should be the correct answer along with explanation you have to tell and also tell why answer given by user is wrong answer.
+
+Rules:
+1.Follow the strict JSON
+2.Always perform one step at a time and wait for next input
+3.Carefully analyze the user query.
+
+Example:
+User Query : "Hey i am beginner in Biochemistry subject and i have learnt basic so make me prepare for NEET PG"
+Output: {{"step":"analyse","content":"The user is beginner in Biochmestry and knows basics so he want to make it strong for NEET PG preparation"}}
+Output: {{"step":"plan","content":"For a beginner of biochemistry i should first ask 2 to 3 questions of difficulty level of 1 on scale of 1 to 10 then next 2 to 3 questions of difficulty level 2-3 on scale of 10 and so on upto 15 questions keeping in mind those question should be relevant to NEET PG only"}}
+Output: {{"step":"work","content":"For question of difficulty 1/10, A beginner student of Biochemistry should know about primary sources of Energy for Earth's climate System.
+For Question of difficulty 2/10, A beginner students should know about Which biomolecule is the main structural component of cell membranes.
+For Question of difficulty 4/10, A beginner should know Which vitamin is a cofactor for carboxylation reactions."}}
+Output: {{"step":"result","content":"These could be the questions:
+1.What is the primary source of energy for Earth's climate system?
+A) Geothermal energy
+B) Solar radiation
+C) Fossil fuels
+D) Nuclear energy
+2.Which biomolecule is the main structural component of cell membranes?
+A) Proteins
+B) Phospholipids
+C) Carbohydrates
+D) Nucleic acids
+3.Which vitamin is a cofactor for carboxylation reactions?
+A) Vitamin C
+B) Vitamin B12
+C) Biotin
+D) Vitamin K"}}
+Output: {{"step":"verification","content":"Yes all questions looks beginner friendly and  related to Biochemistry and NEET PG kind of questions options are also perfect.EveryThing is fine ready to go."}}
+
+Output: {{"step":"output","content":[{{"1.What is the primary source of energy for Earth's climate system?
+A) Geothermal energy
+B) Solar radiation
+C) Fossil fuels
+D) Nuclear energy"}},
+{{"2.Which biomolecule is the main structural component of cell membranes?
+A) Proteins
+B) Phospholipids
+C) Carbohydrates
+D) Nucleic acids"}},
+{{"3.Which vitamin is a cofactor for carboxylation reactions?
+A) Vitamin C
+B) Vitamin B12
+C) Biotin
+D) Vitamin K"}}]}}
+
+Output: {{"step":"answer_analysis","content":"So the user has given answer now first check whether answer is correct or not for 1st question user has choosen option B Solar Radiation which is correct, for second question user has selected option B Phospholipids which is correct for third question user has selected option option D Vitamin K which is incorrect it means user has good knowledge upto difficulty level 2 out of 10 but on on increasing difficulty level more than 2 user is not able to answer properly so total score is 2/3 and user have to improve their learning on arboxylation reactions"}}
+Output: {{"step":"user_result","content":"{{
+[{{
+    "question_number":"1",
+    "selected_option":"B",
+    "correct_answer":"B",
+    "explanation":""
+}},
+{{
+    "question_number":"2",
+    "selected_option":"B",
+    "correct_answer":"B",
+    "explanation":""
+}},
+{{
+    "question_number":"3",
+    "selected_option":"D",
+    "correct_answer":"C",
+    "explanation":"Incorrect Answer! Vitamin K is incorrect because it is primarily a cofactor for gamma-carboxylation of specific proteins involved in blood clotting and bone metabolism, not for general carboxylation reactions. Biotin, on the other hand, is a cofactor for carboxylase enzymes that facilitate carboxylation in metabolic processes like fatty acid synthesis and gluconeogenesis."
+}}
+],
+"total_marks":"total marks out of all",
+"scope of improvement":"Need to improve on any topic"
+}}"}}
+
+when step is result format should be of JSON as described below:
+Output JSON format:
+{{[{{
+    "question_number":"number",
+    "selected_option":"string",
+    "correct_answer":"string",
+    "explanation":"correct answer explanation if selected_option is not correct"
+}},
+{{
+    "question_number":"number",
+    "selected_option":"string",
+    "correct_answer":"string",
+    "explanation":"correct answer explanation if selected_option is not correct"
+}},
+{{
+    "question_number":"number",
+    "selected_option":"string",
+    "correct_answer":"string",
+    "explanation":"correct answer explanation if selected_option is not correct"
+}},
+"total_marks":"total marks out of all",
+"scope of improvement":"Need to improve on any topic"
+]}}
+"""
+
+# messages = [
+#     {"role":"system","content":system_prompt}
+# ]
+
+# Route for generating questions
+@app.route('/generate-questions', methods=['POST'])
+def generate_questions():
+    data = request.json
+    user_query = data.get('query')
+    
+    if not user_query:
+        return jsonify({"error": "No query provided"}), 400
+    
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_query}
+    ]
+    
+    # Initialize response dict to store all steps
+    response_data = {
+        "analysis": "",
+        "questions": ""
+    }
+    
+    # Continue until we reach the output step
+    while True:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            response_format={"type": "json_object"},
+            messages=messages
+        )
+        
+        parsed_response = json.loads(response.choices[0].message.content)
+        messages.append({"role": "assistant", "content": json.dumps(parsed_response)})
+        
+        step = parsed_response.get("step")
+        content = parsed_response.get("content")
+        
+        # Store intermediate steps in response data
+        if step in ["analyse", "plan", "work"]:
+            response_data["analysis"] += f"{step.capitalize()}: {content}\n\n"
+        
+        # Once we reach output step, break the loop
+        if step == "output":
+            response_data["questions"] = content
+            break
+    
+    return jsonify(response_data)
+
+# Route for evaluating answers
+@app.route('/evaluate-answers', methods=['POST'])
+def evaluate_answers():
+    data = request.json
+    
+    if not data.get('conversation_history') or not data.get('answers'):
+        return jsonify({"error": "Missing conversation history or answers"}), 400
+    
+    # Reconstruct conversation history
+    messages = data.get('conversation_history')
+    
+    # Add user's answers to the conversation
+    messages.append({"role": "user", "content": json.dumps(data.get('answers'))})
+    
+    # Continue until we reach the result step
+    while True:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            response_format={"type": "json_object"},
+            messages=messages
+        )
+        
+        parsed_response = json.loads(response.choices[0].message.content)
+        messages.append({"role": "assistant", "content": json.dumps(parsed_response)})
+        
+        step = parsed_response.get("step")
+        content = parsed_response.get("content")
+        
+        # Once we reach user_result step, break the loop
+        if step == "user_result":
+            evaluation_result = content
+            break
+    
+    return jsonify({
+        "evaluation": evaluation_result,
+        "conversation_history": messages
+    })
+
+
+
+system_prompt_ai_assistant = f"""
+Act like a highly experienced doctor with 25 years of clinical practice and a dedicated mentor for NEET PG aspirants and medical students. You have extensive knowledge across all medical disciplines including:
+
+Clinical Subjects:
+- Medicine: Harrison's Principles of Internal Medicine
+- Surgery: Bailey & Love, SRB's Manual
+- Gynecology & Obstetrics: Williams Obstetrics, DC Dutta
+- Pediatrics: Nelson Textbook of Pediatrics, OP Ghai
+- Orthopedics: Handbook of Orthopedics, Maheshwari
+- Dermatology: Fitzpatrick's Dermatology
+- Psychiatry: Kaplan & Sadock
+
+Pre-Clinical & Para-Clinical Subjects:
+- Anatomy: Gray's Anatomy, BD Chaurasia  
+- Physiology: Guyton & Hall, Ganong
+- Biochemistry: Harper's Biochemistry, Vasudevan
+- Pathology: Robbins, Harsh Mohan
+- Pharmacology: Katzung, Tripathi
+- Microbiology: Jawetz, Ananthanarayan
+- Forensic Medicine: Modi, Reddy
+
+Clinical Specialties:
+- Ophthalmology: Kanski, Parson
+- ENT: PL Dhingra, Logan Turner
+- Radiology: Dähnert's Radiology Review
+- Community Medicine: Park, Mahajan
+
+You provide informative, clinically relevant, and practical responses to medical queries, explaining medical concepts in clear language without oversimplification. Your expertise helps MBBS students and NEET PG aspirants understand complex medical topics, resolve their doubts, and improve their clinical knowledge.
+
+You should:
+1. Provide accurate medical information backed by current evidence
+2. Explain complex medical concepts in comprehensible language
+3. Include relevant clinical correlations and applied aspects
+4. Share high-yield information for exam preparation
+5. Provide memory hooks where appropriate
+6. Correct misconceptions politely
+7. Share practical clinical insights from your "experience"
+
+When discussing diseases or conditions:
+- Start with a clear definition
+- Mention etiology and pathophysiology
+- Discuss clinical features and diagnostic approach
+- Cover management principles
+- Highlight important complications
+- Mention recent advances when relevant
+- Add exam-relevant points and commonly tested concepts
+
+For pharmacology queries:
+- Explain mechanism of action
+- Cover clinical uses
+- Discuss important adverse effects
+- Mention contraindications
+- Include clinically significant drug interactions
+
+For anatomy and physiology:
+- Provide clear structural relationships or functional mechanisms
+- Emphasize clinical correlations
+- Explain developmental aspects when relevant
+
+Always maintain a professional, supportive, and encouraging tone. Remember that you're helping future doctors enhance their knowledge and clinical reasoning.
+"""
+
+# Route for handling medical queries
+@app.route('/ask-doctor', methods=['POST'])
+def ask_doctor():
+    data = request.json
+    user_query = data.get('query')
+    
+    if not user_query:
+        return jsonify({"error": "No query provided"}), 400
+    
+    conversation_history = data.get('conversation_history', [])
+    
+    # If there's no conversation history, initialize with system message
+    if not conversation_history:
+        conversation_history = [
+            {"role": "system", "content": system_prompt_ai_assistant}
+        ]
+    
+    # Add current user query to conversation
+    conversation_history.append({"role": "user", "content": user_query})
+    
+    try:
+        # Get response from AI
+        response = client.chat.completions.create(
+            model="gpt-4o",  # Using GPT-4o for better medical knowledge
+            messages=conversation_history
+        )
+        
+        assistant_response = response.choices[0].message.content
+        
+        # Add AI response to conversation history
+        conversation_history.append({"role": "assistant", "content": assistant_response})
+        
+        return jsonify({
+            "response": assistant_response,
+            "conversation_history": conversation_history
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Interactive CLI mode for testing
+def interactive_mode():
+    conversation_history = [{"role": "system", "content": system_prompt_ai_assistant}]
+    print("Doctor AI Assistant (CLI Mode)")
+    print("Type 'exit' to quit")
+    
+    print("\nAI: Hello! I'm your experienced doctor mentor with 25 years of clinical practice. How can I help you with your medical questions or NEET PG preparation?")
+    
+    while True:
+        user_query = input("\nYou: ")
+        if user_query.lower() == 'exit':
+            break
+            
+        conversation_history.append({"role": "user", "content": user_query})
+        
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=conversation_history
+            )
+            
+            assistant_response = response.choices[0].message.content
+            conversation_history.append({"role": "assistant", "content": assistant_response})
+            
+            print(f"\nAI: {assistant_response}")
+            
+        except Exception as e:
+            print(f"\nError: {str(e)}")
+    
+    print("Goodbye!")
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
+
+#################################
+# user_query = input("")
+# messages.append({"role":"user","content":user_query})
+# while True:
+#     response = client.chat.completions.create(
+#         model="gpt-4o",
+#         response_format={"type":"json_object"},
+#         messages = messages
+#     )
+
+#     parsed_response = json.loads(response.choices[0].message.content)
+#     messages.append({"role":"assistant","content":json.dumps(parsed_response)})
+
+#     step = parsed_response.get("step")
+#     content = parsed_response.get("content")
+
+#     # Show what's happening in each step
+#     print(f"\nStep: {step}")
+#     print(f"thinking: {content}")
+
+#     # Once we reach output step (i.e., questions are generated), take user input
+#     if step == "output":
+#         print(f"\nThese are your questions. Please answer them.")
+#         print(content)
+#         answers = input("\nEnter your answers as a JSON string (e.g., {\"1\":\"B\", \"2\":\"C\", \"3\":\"A\"}): ")
+#         try:
+#             answer_dict = json.loads(answers)
+#             messages.append({"role": "user", "content": json.dumps(answer_dict)})
+#         except json.JSONDecodeError:
+#             print("Invalid JSON. Please enter in correct format.")
+#             continue
+
+#     # Once result is shown, break the loop
+#     elif step == "user_result":
+#         print("\nEvaluation Result:")
+#         print(content)
+#         break
+
+    # if(parsed_response.get("step") != "output" and parsed_response.get("step") != "result"):
+    #     print(f"thinking:{parsed_response.get('content')}")
+    #     continue
+
+    # if(parsed_response.get("step") == "output"):
+    #     print(f"These are your questions please answer this{parsed_response.get("content")}")
+    #     answers = input("Enter your answers as a JSON string (e.g., {\"1\":\"B\", \"2\":\"C\", \"3\":\"A\"}): ")
+
+    #     try:
+    #         answer_dict = json.loads(answers)
+    #         messages.append({"role":"user","content":json.dumps(answer_dict)})
+    #     except json.JSONDecodeError:
+    #         print("Invalid JSON. Please enter in correct format.")
+    #         continue
+
+    
+    # if(parsed_response.get("step") == "result"):
+    #     print(parsed_response.get("content"))
+    #     break
