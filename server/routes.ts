@@ -310,7 +310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const caseContent = JSON.parse(response.text);
       const caseStudy = await storage.createCaseStudy({
         userId: user.id,
-        title: caseContent.title || `${speciality} Case Study`,
+        title: caseContent.title || `${specialty} Case Study`,
         content: caseContent,
         specialty,
         difficulty
