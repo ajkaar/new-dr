@@ -2,6 +2,7 @@ import express, { type Express, Request, Response, NextFunction } from "express"
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
+import { hashPassword } from "./utils"; // Assuming this function exists for password hashing
 
 const router = express.Router();
 import { 
@@ -848,6 +849,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+
+  app.post("/api/register", async (req, res, next) => {
+    try {
+      // Check if username already exists
+      const existingUserByUsername = await storage.getUserByUsername(req.body.username);
+      if (existingUserByUsername) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      // Check if email already exists
+      const existingUserByEmail = await storage.getUserByEmail(req.body.email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+
+      // Check for admin creation with secret key
+      const isAdmin = req.body.adminKey === process.env.ADMIN_SECRET;
+
+      const user = await storage.createUser({
+        ...req.body,
+        role: isAdmin ? 'admin' : 'user',
+        password: await hashPassword(req.body.password),
+      });
+
+      res.status(201).json(user);
+    } catch (error) {
+      next(error);
+    }
+  });
+
 
   const httpServer = createServer(app);
 
