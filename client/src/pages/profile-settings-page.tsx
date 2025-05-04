@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { Loader2, Upload, Share2, Copy, WhatsappLogo } from 'lucide-react';
+import { Loader2, Upload, Share2, Copy, MessageSquare } from 'lucide-react';
 import { Redirect } from 'wouter';
 import AppLayout from '@/components/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -68,14 +67,14 @@ export default function ProfileSettingsPage() {
       setImageFile(file);
       const formData = new FormData();
       formData.append('avatar', file);
-      
+
       try {
         const response = await fetch('/api/user/upload-avatar', {
           method: 'POST',
           body: formData,
         });
         if (!response.ok) throw new Error('Failed to upload image');
-        
+
         toast({
           title: "Success",
           description: "Profile picture updated successfully"
@@ -99,9 +98,9 @@ export default function ProfileSettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      
+
       if (!response.ok) throw new Error('Failed to update profile');
-      
+
       toast({
         title: "Success",
         description: "Profile updated successfully"
@@ -318,7 +317,7 @@ export default function ProfileSettingsPage() {
                         Share Link
                       </Button>
                       <Button variant="outline">
-                        <WhatsappLogo className="h-4 w-4" />
+                        <MessageSquare className="h-4 w-4" />
                       </Button>
                     </div>
 
