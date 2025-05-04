@@ -2,7 +2,7 @@ import { apiRequest } from "./queryClient";
 
 // AI Chat Assistant
 export async function sendChatMessage(message: string, conversationHistory: any[] = []) {
-  const response = await fetch('http://localhost:5000/ask-doctor', {
+  const response = await fetch('/api/ask-doctor', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -17,7 +17,7 @@ export async function sendChatMessage(message: string, conversationHistory: any[
 
 // Quiz Generator
 export async function generateQuiz(subject: string, topic: string, difficulty: string, numQuestions: number) {
-  const response = await fetch('http://localhost:5000/generate-questions', {
+  const response = await fetch('/api/generate-questions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -41,7 +41,7 @@ export async function generateQuiz(subject: string, topic: string, difficulty: s
 
 // Submit Quiz Answers
 export async function evaluateQuizAnswers(conversationHistory: any[], answers: any) {
-  const response = await fetch('http://localhost:5000/evaluate-answers', {
+  const response = await fetch('/api/evaluate-answers', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
