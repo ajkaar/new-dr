@@ -33,6 +33,7 @@ export default function CaseGeneratorPage() {
   const [userAnswer, setUserAnswer] = useState('');
   const [showAnswer, setShowAnswer] = useState(false);
   const [specialty, setSpecialty] = useState('medicine');
+  const [difficulty, setDifficulty] = useState('moderate');
   const [caseData, setCaseData] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -77,13 +78,14 @@ export default function CaseGeneratorPage() {
             <CardTitle>Case Settings</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Specialty</Label>
-              <Select value={specialty} onValueChange={setSpecialty}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select specialty" />
-                </SelectTrigger>
-                <SelectContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Specialty</Label>
+                <Select value={specialty} onValueChange={setSpecialty}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select specialty" />
+                  </SelectTrigger>
+                  <SelectContent>
                   <SelectItem value="internal-medicine">Internal Medicine</SelectItem>
                   <SelectItem value="cardiology">Cardiology</SelectItem>
                   <SelectItem value="pulmonology">Pulmonology</SelectItem>
@@ -101,6 +103,21 @@ export default function CaseGeneratorPage() {
                   <SelectItem value="ent">ENT</SelectItem>
                 </SelectContent>
               </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Difficulty</Label>
+                <Select value={difficulty} onValueChange={setDifficulty}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select difficulty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="easy">Easy</SelectItem>
+                    <SelectItem value="moderate">Moderate</SelectItem>
+                    <SelectItem value="hard">Hard</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <Button 
