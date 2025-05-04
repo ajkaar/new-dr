@@ -20,6 +20,7 @@ import DrugAssistantPage from "@/pages/drug-assistant-page";
 import NotesMakerPage from "@/pages/notes-maker-page";
 import StudyPlannerPage from "@/pages/study-planner-page";
 import MedFeedPage from "@/pages/med-feed-page";
+import ProfileSettingsPage from "@/pages/profile-settings-page";
 import NotFound from "@/pages/not-found";
 
 function Router() {
