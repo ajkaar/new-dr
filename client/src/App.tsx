@@ -1,4 +1,3 @@
-
 import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -22,6 +21,8 @@ import StudyPlannerPage from "@/pages/study-planner-page";
 import MedFeedPage from "@/pages/med-feed-page";
 import ProfileSettingsPage from "@/pages/profile-settings-page";
 import NotFound from "@/pages/not-found";
+import SettingsPage from "@/pages/settings-page"; // Added import
+
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -50,7 +51,7 @@ function Router() {
       <Route path="/notes-maker" component={NotesMakerPage} />
       <Route path="/study-planner" component={StudyPlannerPage} />
       <Route path="/med-feed" component={MedFeedPage} />
-      <Route path="/settings" component={ProfileSettingsPage} />
+      <Route path="/settings" component={SettingsPage} />
       <Route path="/profile" component={ProfileSettingsPage} />
       <Route component={NotFound} />
     </Switch>
