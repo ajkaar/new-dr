@@ -51,6 +51,7 @@ function Router() {
       <Route path="/study-planner" component={StudyPlannerPage} />
       <Route path="/med-feed" component={MedFeedPage} />
       <Route path="/settings" component={ProfileSettingsPage} />
+      <Route path="/profile" component={ProfileSettingsPage} />
       <Route component={NotFound} />
     </Switch>
   );
