@@ -1,4 +1,3 @@
-
 export async function generateCase(specialty: string, difficulty: string) {
   const response = await fetch('/api/case/generate', {
     method: 'POST',
@@ -40,7 +39,7 @@ export async function generateQuiz(subject: string, topic: string, difficulty: s
   });
 
   const data = await response.json();
-  
+
   // Transform the response format to match expected structure
   return {
     quiz: {
