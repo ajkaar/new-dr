@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation, useNavigate } from 'wouter';
 import { 
   Menu, 
   Bell, 
@@ -30,6 +30,7 @@ interface TopNavigationProps {
 const TopNavigation: React.FC<TopNavigationProps> = ({ toggleSidebar, user }) => {
   const { logoutMutation } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +52,27 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ toggleSidebar, user }) =>
       .toUpperCase()
       .substring(0, 2);
   };
+
+  const ProfileMenuItem = () => {
+    const navigate = useNavigate();
+    return (
+      <div onClick={() => navigate("/profile")} className="cursor-pointer">
+        <User className="mr-2 h-4 w-4" />
+        <span>Profile</span>
+      </div>
+    );
+  };
+
+  const SettingsMenuItem = () => {
+    const navigate = useNavigate();
+    return (
+      <div onClick={() => navigate("/settings")} className="cursor-pointer">
+        <Settings className="mr-2 h-4 w-4" />
+        <span>Settings</span>
+      </div>
+    );
+  };
+
 
   return (
     <div className="bg-white shadow-sm z-10">
@@ -88,7 +110,7 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ toggleSidebar, user }) =>
               </form>
             </div>
           </div>
-          
+
           <div className="flex items-center ml-4 md:ml-6 space-x-4">
             {/* Notifications */}
             <DropdownMenu>
@@ -106,14 +128,14 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ toggleSidebar, user }) =>
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
-            
+
             {/* Help */}
             <Link href="/help-support">
               <a className="p-1 text-gray-500 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 <HelpCircle className="h-6 w-6" />
               </a>
             </Link>
-            
+
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -129,13 +151,11 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ toggleSidebar, user }) =>
                   {user?.fullName || 'User'}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                <DropdownMenuItem asChild>
+                  <ProfileMenuItem />
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                <DropdownMenuItem asChild>
+                  <SettingsMenuItem />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
