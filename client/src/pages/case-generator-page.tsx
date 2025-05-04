@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Loader2 } from 'lucide-react';
@@ -64,7 +63,8 @@ export default function CaseGeneratorPage() {
     setIsGenerating(false);
   };
 
-  const progress = caseData?.steps ? ((currentStep + 1) / caseData.steps.length) * 100 : 0;
+  const totalSteps = caseData?.steps?.length || 0;
+  const progress = totalSteps > 0 ? ((currentStep + 1) / totalSteps) * 100 : 0;
 
   return (
     <AppLayout
@@ -104,7 +104,7 @@ export default function CaseGeneratorPage() {
                 </SelectContent>
               </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Difficulty</Label>
                 <Select value={difficulty} onValueChange={setDifficulty}>
@@ -154,7 +154,7 @@ export default function CaseGeneratorPage() {
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
                     <div className="text-sm text-muted-foreground">
-                      Step {currentStep + 1} of {caseData.steps.length}
+                      Step {currentStep + 1} of {totalSteps}
                     </div>
                     <Progress value={progress} className="w-1/2" />
                   </div>
@@ -205,16 +205,16 @@ export default function CaseGeneratorPage() {
                     >
                       {showAnswer ? "Hide Answer" : "Show Answer"}
                     </Button>
-                    
+
                     <Button
                       onClick={() => {
-                        if (currentStep < caseData.steps.length - 1) {
+                        if (currentStep < totalSteps - 1) {
                           setCurrentStep(currentStep + 1);
                           setShowAnswer(false);
                           setUserAnswer('');
                         }
                       }}
-                      disabled={currentStep === caseData.steps.length - 1}
+                      disabled={currentStep === totalSteps - 1}
                     >
                       Next Step <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
