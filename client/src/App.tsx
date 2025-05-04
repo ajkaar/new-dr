@@ -49,6 +49,7 @@ function Router() {
       <Route path="/notes-maker" component={NotesMakerPage} />
       <Route path="/study-planner" component={StudyPlannerPage} />
       <Route path="/med-feed" component={MedFeedPage} />
+      <Route path="/settings" component={ProfileSettingsPage} />
       <Route component={NotFound} />
     </Switch>
   );
