@@ -30,7 +30,7 @@ interface TopNavigationProps {
 const TopNavigation: React.FC<TopNavigationProps> = ({ toggleSidebar, user }) => {
   const { logoutMutation } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,25 +53,19 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ toggleSidebar, user }) =>
       .substring(0, 2);
   };
 
-  const ProfileMenuItem = () => {
-    const [, setLocation] = useLocation();
-    return (
-      <div onClick={() => setLocation("/profile")} className="cursor-pointer">
-        <User className="mr-2 h-4 w-4" />
-        <span>Profile</span>
-      </div>
-    );
-  };
+  const ProfileMenuItem = () => (
+    <div onClick={() => setLocation("/profile")} className="cursor-pointer">
+      <User className="mr-2 h-4 w-4" />
+      <span>Profile</span>
+    </div>
+  );
 
-  const SettingsMenuItem = () => {
-    const [, setLocation] = useLocation();
-    return (
-      <div onClick={() => setLocation("/settings")} className="cursor-pointer">
-        <Settings className="mr-2 h-4 w-4" />
-        <span>Settings</span>
-      </div>
-    );
-  };
+  const SettingsMenuItem = () => (
+    <div onClick={() => setLocation("/settings")} className="cursor-pointer">
+      <Settings className="mr-2 h-4 w-4" />
+      <span>Settings</span>
+    </div>
+  );
 
 
   return (
