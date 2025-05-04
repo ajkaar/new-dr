@@ -1,7 +1,5 @@
-import postgres from "postgres";
 import session from "express-session";
 import createMemoryStore from "memorystore";
-import { drizzle } from "drizzle-orm/postgres-js";
 import { 
   users, type User, type InsertUser,
   quizAttempts, type QuizAttempt, type InsertQuizAttempt,
@@ -386,12 +384,8 @@ export class MemStorage implements IStorage {
 
 export const storage = new MemStorage();
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL must be set");
-}
-
-const sql = postgres(process.env.DATABASE_URL);
-export const db = drizzle(sql);
+// Using memory storage for now
+export const db = storage;
 
 export async function getUserSettings(userId: number) {
   const settings = await db.query.userSettings.findFirst({
