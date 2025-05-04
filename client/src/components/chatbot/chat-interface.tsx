@@ -47,9 +47,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!inputMessage.trim()) return;
-    
+
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -57,14 +57,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       sender: 'user',
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
-    
+
     try {
-      const response = await sendChatMessage(inputMessage);
-      
+      const conversationHistory = messages.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.content
+      }));
+
+      const response = await sendChatMessage(inputMessage, conversationHistory);
+
       // Add assistant message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -72,9 +77,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         sender: 'assistant',
         timestamp: new Date()
       };
-      
+
       setMessages(prev => [...prev, assistantMessage]);
-      
+
       // Update token usage if callback provided
       if (onTokenUsageUpdate && response.tokenUsage) {
         onTokenUsageUpdate(response.tokenUsage.current);
@@ -144,7 +149,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         )}
         <div ref={messagesEndRef} />
       </div>
-      
+
       {/* Input Area */}
       <div className="border-t p-4">
         <form onSubmit={handleSubmit} className="flex space-x-2">

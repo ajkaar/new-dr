@@ -70,10 +70,10 @@ const QuizGeneratorPage: React.FC = () => {
   const [quizSubject, setQuizSubject] = useState('');
   const [quizTopic, setQuizTopic] = useState('');
   const [quizDifficulty, setQuizDifficulty] = useState('');
-  
+
   const { toast } = useToast();
   const { user } = useAuth();
-  
+
   interface QuizHistoryItem {
   id: number;
   subject: string;
@@ -162,33 +162,37 @@ const QuizGeneratorPage: React.FC = () => {
     setIsGenerating(true);
     try {
       const numQuestionsInt = parseInt(values.numQuestions);
-      
+
       // Set quiz metadata
       setQuizSubject(values.subject);
       setQuizTopic(values.topic);
       setQuizDifficulty(values.difficulty);
-      
+
       const response = await generateQuiz(
         values.subject,
         values.topic,
         values.difficulty,
         numQuestionsInt
       );
-      
+
+      if (response.analysis) {
+        console.log("Analysis:", response.analysis);
+      }
+
       if (response.quiz && response.quiz.questions) {
         setQuizQuestions(response.quiz.questions);
         toast({
           title: "Quiz Generated",
           description: `Created ${response.quiz.questions.length} questions on ${values.topic}`,
         });
-        
+
         // Reset quiz state
         setCurrentQuestion(0);
         setSelectedAnswers({});
         setShowExplanation(false);
         setQuizStartTime(null);
         setQuizEndTime(null);
-        
+
         // Switch to quiz tab
         setActiveTab('quiz');
       } else {
@@ -215,7 +219,7 @@ const QuizGeneratorPage: React.FC = () => {
   // Select answer
   const selectAnswer = (questionIndex: number, answer: string) => {
     if (!isQuizActive) return;
-    
+
     setSelectedAnswers(prev => ({
       ...prev,
       [questionIndex]: answer
@@ -251,7 +255,7 @@ const QuizGeneratorPage: React.FC = () => {
     setIsQuizActive(false);
     setQuizEndTime(new Date());
     setShowExplanation(true);
-    
+
     // Calculate and save score
     saveQuizResult();
   };
@@ -259,24 +263,24 @@ const QuizGeneratorPage: React.FC = () => {
   // Calculate score
   const calculateScore = () => {
     let correctCount = 0;
-    
+
     quizQuestions.forEach((q, index) => {
       if (selectedAnswers[index] === q.correctAnswer) {
         correctCount++;
       }
     });
-    
+
     return correctCount;
   };
 
   // Save quiz result
   const saveQuizResult = async () => {
     if (!quizStartTime || !quizEndTime) return;
-    
+
     const score = calculateScore();
     const totalQuestions = quizQuestions.length;
     const timeTakenSeconds = Math.round((quizEndTime.getTime() - quizStartTime.getTime()) / 1000);
-    
+
     try {
       await submitQuizAttempt(
         quizSubject,
@@ -286,7 +290,7 @@ const QuizGeneratorPage: React.FC = () => {
         totalQuestions,
         timeTakenSeconds
       );
-      
+
       toast({
         title: "Quiz Result Saved",
         description: `Your score: ${score}/${totalQuestions} (${Math.round((score/totalQuestions)*100)}%)`,
@@ -309,11 +313,11 @@ const QuizGeneratorPage: React.FC = () => {
   // Format quiz time
   const formatQuizTime = () => {
     if (!quizStartTime || !quizEndTime) return "N/A";
-    
+
     const seconds = Math.round((quizEndTime.getTime() - quizStartTime.getTime()) / 1000);
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    
+
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
@@ -328,7 +332,7 @@ const QuizGeneratorPage: React.FC = () => {
           <TabsTrigger value="quiz" disabled={quizQuestions.length === 0}>Take Quiz</TabsTrigger>
           <TabsTrigger value="history">Quiz History</TabsTrigger>
         </TabsList>
-        
+
         {/* Quiz Generator */}
         <TabsContent value="generator">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -372,7 +376,7 @@ const QuizGeneratorPage: React.FC = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="topic"
@@ -412,7 +416,7 @@ const QuizGeneratorPage: React.FC = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
@@ -440,7 +444,7 @@ const QuizGeneratorPage: React.FC = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={form.control}
                         name="numQuestions"
@@ -468,7 +472,7 @@ const QuizGeneratorPage: React.FC = () => {
                         )}
                       />
                     </div>
-                    
+
                     <Button 
                       type="submit" 
                       className="w-full" 
@@ -490,7 +494,7 @@ const QuizGeneratorPage: React.FC = () => {
                 </Form>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Quiz Tips</CardTitle>
@@ -505,21 +509,21 @@ const QuizGeneratorPage: React.FC = () => {
                     For better results, select specific topics rather than broad subjects
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium">Progressive Learning</h3>
                   <p className="text-sm text-muted-foreground">
                     Start with easier difficulty and gradually increase as you improve
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium">Timed Practice</h3>
                   <p className="text-sm text-muted-foreground">
                     Use the timer feature to simulate exam conditions
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium">Review Explanations</h3>
                   <p className="text-sm text-muted-foreground">
@@ -535,7 +539,7 @@ const QuizGeneratorPage: React.FC = () => {
             </Card>
           </div>
         </TabsContent>
-        
+
         {/* Quiz Taking Interface */}
         <TabsContent value="quiz">
           {quizQuestions.length > 0 && (
@@ -550,7 +554,7 @@ const QuizGeneratorPage: React.FC = () => {
                     Difficulty: {form.getValues().difficulty} • {quizQuestions.length} Questions
                   </p>
                 </div>
-                
+
                 {!isQuizActive && !quizEndTime ? (
                   <Button onClick={startQuiz}>
                     <Clock className="mr-2 h-4 w-4" />
@@ -569,7 +573,7 @@ const QuizGeneratorPage: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               {/* Progress Bar */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
@@ -583,7 +587,7 @@ const QuizGeneratorPage: React.FC = () => {
                   className="h-2"
                 />
               </div>
-              
+
               {/* Question Card */}
               <Card>
                 <CardHeader>
@@ -629,7 +633,7 @@ const QuizGeneratorPage: React.FC = () => {
                     ))}
                   </RadioGroup>
                 </CardContent>
-                
+
                 {/* Explanation */}
                 {(showExplanation || quizEndTime) && (
                   <div className="px-6 py-4 bg-gray-50 border-t">
@@ -651,7 +655,7 @@ const QuizGeneratorPage: React.FC = () => {
                     </div>
                   </div>
                 )}
-                
+
                 <CardFooter className="flex justify-between py-4">
                   <Button 
                     variant="outline" 
@@ -661,7 +665,7 @@ const QuizGeneratorPage: React.FC = () => {
                     <ChevronLeft className="h-4 w-4 mr-1" />
                     Previous
                   </Button>
-                  
+
                   <div className="flex space-x-2">
                     {isQuizActive && !quizEndTime && (
                       <Button
@@ -671,7 +675,7 @@ const QuizGeneratorPage: React.FC = () => {
                         {showExplanation ? "Hide Explanation" : "Show Explanation"}
                       </Button>
                     )}
-                    
+
                     {isQuizActive && !quizEndTime && currentQuestion === quizQuestions.length - 1 && (
                       <Button
                         variant="default"
@@ -680,7 +684,7 @@ const QuizGeneratorPage: React.FC = () => {
                         Finish Quiz
                       </Button>
                     )}
-                    
+
                     {(!isQuizActive && !quizEndTime) || quizEndTime ? (
                       <Button
                         variant="outline"
@@ -701,7 +705,7 @@ const QuizGeneratorPage: React.FC = () => {
                   </div>
                 </CardFooter>
               </Card>
-              
+
               {/* Results Summary (only shown when quiz is complete) */}
               {quizEndTime && (
                 <Card>
@@ -721,7 +725,7 @@ const QuizGeneratorPage: React.FC = () => {
                           Score
                         </div>
                       </div>
-                      
+
                       <div className="bg-gray-50 p-4 rounded-lg text-center">
                         <div className="text-3xl font-bold text-primary">
                           {Math.round((calculateScore() / quizQuestions.length) * 100)}%
@@ -730,7 +734,7 @@ const QuizGeneratorPage: React.FC = () => {
                           Percentage
                         </div>
                       </div>
-                      
+
                       <div className="bg-gray-50 p-4 rounded-lg text-center">
                         <div className="text-3xl font-bold text-primary">
                           {formatQuizTime()}
@@ -761,7 +765,7 @@ const QuizGeneratorPage: React.FC = () => {
             </div>
           )}
         </TabsContent>
-        
+
         {/* Quiz History */}
         <TabsContent value="history">
           <Card>
@@ -816,7 +820,7 @@ const QuizGeneratorPage: React.FC = () => {
                       </tbody>
                     </table>
                   </div>
-                  
+
                   {/* Basic Performance Chart */}
                   <div className="mt-6">
                     <h3 className="text-lg font-medium mb-4">Performance Trend</h3>

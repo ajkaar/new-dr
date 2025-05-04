@@ -1,3 +1,60 @@
+import { apiRequest } from "./queryClient";
+
+// AI Chat Assistant
+export async function sendChatMessage(message: string, conversationHistory: any[] = []) {
+  const response = await fetch('http://localhost:5000/ask-doctor', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      query: message,
+      conversation_history: conversationHistory
+    })
+  });
+  return response.json();
+}
+
+// Quiz Generator
+export async function generateQuiz(subject: string, topic: string, difficulty: string, numQuestions: number) {
+  const response = await fetch('http://localhost:5000/generate-questions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ 
+      query: `I am preparing for NEET PG and want questions on ${topic} in ${subject} at ${difficulty} difficulty level` 
+    })
+  });
+
+  const data = await response.json();
+  return {
+    analysis: data.analysis,
+    questions: data.questions.map((q: any, index: number) => ({
+      question: q,
+      options: q.options || {},
+      correctAnswer: q.correct_answer || "",
+      explanation: q.explanation || ""
+    }))
+  };
+}
+
+// Submit Quiz Answers
+export async function evaluateQuizAnswers(conversationHistory: any[], answers: any) {
+  const response = await fetch('http://localhost:5000/evaluate-answers', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      conversation_history: conversationHistory,
+      answers
+    })
+  });
+  return response.json();
+}
+
+
 export async function generateCase(specialty: string, difficulty: string) {
   const response = await fetch('/api/case/generate', {
     method: 'POST',
@@ -14,45 +71,10 @@ export async function generateCase(specialty: string, difficulty: string) {
   return response.json();
 }
 
-import { apiRequest } from "./queryClient";
-
-// AI Chatbot
-export async function sendChatMessage(prompt: string) {
-  const response = await apiRequest("POST", "/api/chat", { prompt });
-  return await response.json();
-}
-
 // Diagnosis Tool
 export async function getDiagnosis(symptoms: string) {
   const response = await apiRequest("POST", "/api/diagnosis", { symptoms });
   return await response.json();
-}
-
-// Quiz Generator
-export async function generateQuiz(subject: string, topic: string, difficulty: string, numQuestions: number) {
-  const response = await fetch('http://127.0.0.1:5000/generate-questions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ subject, topic, difficulty, numQuestions })
-  });
-
-  const data = await response.json();
-
-  // Transform the response format to match expected structure
-  return {
-    quiz: {
-      questions: data.questions.map((q: any, index: number) => ({
-        question: q.question,
-        options: Object.fromEntries(
-          q.options.map((opt: string) => [opt.charAt(0), opt.slice(3)])
-        ),
-        correctAnswer: "A", // You'll need to modify this based on your Python response
-        explanation: "Explanation will be added", // You'll need to modify this based on your Python response
-      }))
-    }
-  };
 }
 
 // Submit Quiz Attempt
