@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { 
   Menu, 
   Bell, 
@@ -54,9 +54,9 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ toggleSidebar, user }) =>
   };
 
   const ProfileMenuItem = () => {
-    const navigate = useNavigate();
+    const [, setLocation] = useLocation();
     return (
-      <div onClick={() => navigate("/profile")} className="cursor-pointer">
+      <div onClick={() => setLocation("/profile")} className="cursor-pointer">
         <User className="mr-2 h-4 w-4" />
         <span>Profile</span>
       </div>
@@ -64,9 +64,9 @@ const TopNavigation: React.FC<TopNavigationProps> = ({ toggleSidebar, user }) =>
   };
 
   const SettingsMenuItem = () => {
-    const navigate = useNavigate();
+    const [, setLocation] = useLocation();
     return (
-      <div onClick={() => navigate("/settings")} className="cursor-pointer">
+      <div onClick={() => setLocation("/settings")} className="cursor-pointer">
         <Settings className="mr-2 h-4 w-4" />
         <span>Settings</span>
       </div>
