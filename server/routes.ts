@@ -1,8 +1,11 @@
 import express, { type Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
-import { hashPassword } from "./utils"; // Assuming this function exists for password hashing
+import { hashPassword } from "./utils";
+
+const upload = multer({ dest: 'uploads/' }); // Assuming this function exists for password hashing
 
 const router = express.Router();
 import { 
