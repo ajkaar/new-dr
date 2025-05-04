@@ -22,6 +22,9 @@ export default function ProfileSettingsPage() {
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
     email: user?.email || '',
+    phone: user?.phone || '',
+    medicalYear: user?.medicalYear || '',
+    collegeName: user?.collegeName || '',
   });
 
   // Mock data - replace with real API data
@@ -162,13 +165,67 @@ export default function ProfileSettingsPage() {
                       <Input
                         value={formData.fullName}
                         onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                        placeholder="Enter your full name"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label>Email</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={formData.email}
+                          onChange={(e) => setFormData({...formData, email: e.target.value})}
+                          placeholder="Enter your email"
+                        />
+                        {user?.emailVerified ? (
+                          <Badge variant="success" className="mt-2">Verified</Badge>
+                        ) : (
+                          <Button variant="outline" size="sm" className="mt-2">
+                            Verify Email
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Phone Number</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={formData.phone}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                          placeholder="Enter your phone number"
+                        />
+                        {user?.phoneVerified ? (
+                          <Badge variant="success" className="mt-2">Verified</Badge>
+                        ) : (
+                          <Button variant="outline" size="sm" className="mt-2">
+                            Verify Phone
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Medical Year/Batch</Label>
+                      <Select 
+                        value={formData.medicalYear}
+                        onValueChange={(value) => setFormData({...formData, medicalYear: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1st_year">1st Year MBBS</SelectItem>
+                          <SelectItem value="2nd_year">2nd Year MBBS</SelectItem>
+                          <SelectItem value="3rd_year">3rd Year MBBS</SelectItem>
+                          <SelectItem value="final_year">Final Year MBBS</SelectItem>
+                          <SelectItem value="intern">Internship</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Medical College Name</Label>
                       <Input
-                        value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        value={formData.collegeName}
+                        onChange={(e) => setFormData({...formData, collegeName: e.target.value})}
+                        placeholder="Enter your medical college name"
                       />
                     </div>
                     <div className="pt-2">
