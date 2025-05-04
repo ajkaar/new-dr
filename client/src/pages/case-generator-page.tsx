@@ -64,7 +64,7 @@ export default function CaseGeneratorPage() {
     setIsGenerating(false);
   };
 
-  const progress = caseData ? ((currentStep + 1) / caseData.steps.length) * 100 : 0;
+  const progress = caseData?.steps ? ((currentStep + 1) / caseData.steps.length) * 100 : 0;
 
   return (
     <AppLayout
