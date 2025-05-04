@@ -691,21 +691,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update User Profile
-  app.post("/api/profile/update", authenticate, async (req, res, next) => {
+  // Profile Management
+  app.get("/api/user/profile", authenticate, async (req, res) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
       const user = req.user as Express.User;
+      const profile = await storage.getUserProfile(user.id);
+      res.json(profile);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch profile" });
+    }
+  });
+
+  app.post("/api/user/profile/edit", authenticate, async (req, res) => {
+    try {
+      const user = req.user as Express.User;
+      const { fullName, email } = req.body;
+      
       const updatedUser = await storage.updateUser(user.id, {
-        ...req.body,
+        fullName,
+        email,
         lastUpdated: new Date()
       });
 
       res.json(updatedUser);
     } catch (error) {
-      next(error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  app.post("/api/user/upload-avatar", authenticate, upload.single('avatar'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const user = req.user as Express.User;
+      const fileUrl = await storage.uploadProfilePicture(user.id, req.file);
+      
+      await storage.updateUser(user.id, {
+        profilePicture: fileUrl
+      });
+
+      res.json({ url: fileUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to upload profile picture" });
+    }
+  });
+
+  app.get("/api/user/stats", authenticate, async (req, res) => {
+    try {
+      const user = req.user as Express.User;
+      const stats = await storage.getUserStats(user.id);
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user stats" });
+    }
+  });
+
+  app.get("/api/user/referrals", authenticate, async (req, res) => {
+    try {
+      const user = req.user as Express.User;
+      const referrals = await storage.getUserReferrals(user.id);
+      res.json(referrals);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch referrals" });
     }
   });
 

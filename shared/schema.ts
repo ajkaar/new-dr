@@ -15,6 +15,11 @@ export const users = pgTable("users", {
   subscriptionStatus: text("subscription_status").notNull().default("free_trial"),
   tokenUsage: integer("token_usage").notNull().default(0),
   tokenLimit: integer("token_limit").notNull().default(20000),
+  profilePicture: text("profile_picture"),
+  planExpiryDate: timestamp("plan_expiry_date"),
+  referralCode: text("referral_code").unique(),
+  totalReferrals: integer("total_referrals").default(0),
+  rewardsEarned: integer("rewards_earned").default(0),
   // Profile fields
   dateOfBirth: timestamp("date_of_birth"),
   college: text("college"),
