@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Loader2, Moon, Sun, Languages, Bell, Shield, HelpCircle, Info } from 'lucide-react';
@@ -28,7 +27,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const [isDeactivateOpen, setIsDeactivateOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -199,8 +198,8 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-0.5">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+                    <div className="space-y-0.5 flex-1">
                       <Label>New Case Available</Label>
                       <p className="text-sm text-muted-foreground">
                         Get notified when new cases are added
@@ -212,8 +211,8 @@ export default function SettingsPage() {
                         setNotifications({...notifications, newCase: checked})}
                     />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-0.5">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+                    <div className="space-y-0.5 flex-1">
                       <Label>News Updates</Label>
                       <p className="text-sm text-muted-foreground">
                         Receive medical news and updates
@@ -225,8 +224,8 @@ export default function SettingsPage() {
                         setNotifications({...notifications, newsUpdates: checked})}
                     />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-0.5">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+                    <div className="space-y-0.5 flex-1">
                       <Label>Study Plan Reminders</Label>
                       <p className="text-sm text-muted-foreground">
                         Get reminded about your study schedule
@@ -238,8 +237,8 @@ export default function SettingsPage() {
                         setNotifications({...notifications, studyPlan: checked})}
                     />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-0.5">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+                    <div className="space-y-0.5 flex-1">
                       <Label>Subscription Alerts</Label>
                       <p className="text-sm text-muted-foreground">
                         Get notified about subscription status
@@ -336,8 +335,8 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-0.5">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+                    <div className="space-y-0.5 flex-1">
                       <Label>Share Usage Data</Label>
                       <p className="text-sm text-muted-foreground">
                         Help us improve by sharing anonymous usage data
@@ -349,8 +348,8 @@ export default function SettingsPage() {
                         setPrivacySettings({...privacySettings, shareData: checked})}
                     />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-0.5">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+                    <div className="space-y-0.5 flex-1">
                       <Label>Analytics</Label>
                       <p className="text-sm text-muted-foreground">
                         Allow analytics to improve your experience
