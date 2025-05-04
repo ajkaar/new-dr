@@ -8,11 +8,17 @@ export async function sendChatMessage(message: string, conversationHistory: any[
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      query: message,
+      message: message,
       conversation_history: conversationHistory
     })
   });
-  return response.json();
+
+  if (!response.ok) {
+    throw new Error('Failed to get response from AI');
+  }
+
+  const data = await response.json();
+  return data;
 }
 
 // Quiz Generator
@@ -23,20 +29,19 @@ export async function generateQuiz(subject: string, topic: string, difficulty: s
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ 
-      query: `I am preparing for NEET PG and want questions on ${topic} in ${subject} at ${difficulty} difficulty level` 
+      subject,
+      topic,
+      difficulty,
+      num_questions: numQuestions
     })
   });
 
+  if (!response.ok) {
+    throw new Error('Failed to generate quiz');
+  }
+
   const data = await response.json();
-  return {
-    analysis: data.analysis,
-    questions: data.questions.map((q: any, index: number) => ({
-      question: q,
-      options: q.options || {},
-      correctAnswer: q.correct_answer || "",
-      explanation: q.explanation || ""
-    }))
-  };
+  return data;
 }
 
 // Submit Quiz Answers
@@ -51,10 +56,15 @@ export async function evaluateQuizAnswers(conversationHistory: any[], answers: a
       answers
     })
   });
+
+  if (!response.ok) {
+    throw new Error('Failed to evaluate answers');
+  }
+
   return response.json();
 }
 
-
+// Case Generator
 export async function generateCase(specialty: string, difficulty: string) {
   const response = await fetch('/api/case/generate', {
     method: 'POST',
