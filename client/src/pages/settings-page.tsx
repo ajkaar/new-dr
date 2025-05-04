@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { Loader2, Moon, Sun, Languages, Bell, Shield, HelpCircle, Info } from 'lucide-react';
+import { Loader2, Moon, Sun, Languages, Bell, Shield, HelpCircle, Info, Mail, MessageCircle, Book, FileQuestion, Video, Bug, FileWarning, MessageSquare } from 'lucide-react';
 import { Redirect } from 'wouter';
 import AppLayout from '@/components/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -388,20 +388,75 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle>Help & Support</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4">
-                  <Button variant="outline" className="justify-start">
-                    <HelpCircle className="mr-2 h-4 w-4" />
-                    Contact Support
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <Info className="mr-2 h-4 w-4" />
-                    FAQs/Help Center
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <Shield className="mr-2 h-4 w-4" />
-                    Report an Issue
-                  </Button>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center mb-3">
+                      <HelpCircle className="h-5 w-5 mr-2" />
+                      <h3 className="font-medium">Contact Support</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Get help from our dedicated support team. Available 24/7 for premium users.
+                    </p>
+                    <div className="space-y-2">
+                      <Button variant="outline" className="w-full justify-start">
+                        <Mail className="mr-2 h-4 w-4" />
+                        Email Support
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start">
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        Live Chat (Premium)
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center mb-3">
+                      <Info className="h-5 w-5 mr-2" />
+                      <h3 className="font-medium">FAQs/Help Center</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Browse through common questions and detailed guides about using DRNXT Learning.
+                    </p>
+                    <div className="space-y-2">
+                      <Button variant="outline" className="w-full justify-start">
+                        <Book className="mr-2 h-4 w-4" />
+                        User Guide
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start">
+                        <FileQuestion className="mr-2 h-4 w-4" />
+                        Common Questions
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start">
+                        <Video className="mr-2 h-4 w-4" />
+                        Video Tutorials
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center mb-3">
+                      <Shield className="h-5 w-5 mr-2" />
+                      <h3 className="font-medium">Report an Issue</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Report technical problems, content errors, or provide feedback.
+                    </p>
+                    <div className="space-y-2">
+                      <Button variant="outline" className="w-full justify-start">
+                        <Bug className="mr-2 h-4 w-4" />
+                        Technical Issue
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start">
+                        <FileWarning className="mr-2 h-4 w-4" />
+                        Content Error
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start">
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Feature Request
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
